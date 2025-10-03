@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Stick It On — Предпросмотр сайта</title>
+  <link rel="icon" href="logo-icon.png" type="image/png" />
+  <style>
+    :root{ --bg:#ffffff; --panel:#ffffff; --text:#111111; --muted:#555555; --border:#e5e7eb; --radius:20px; --shadow:0 10px 30px rgba(0,0,0,.08) }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Inter,Roboto,Arial,sans-serif}
+    a{color:inherit;text-decoration:none}
+    header{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.75);backdrop-filter:blur(8px);border-bottom:1px solid var(--border)}
+    .bar{max-width:1100px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:10px}
+    .brandmini{width:40px;height:40px;border-radius:50%;overflow:hidden;border:1px solid var(--border);display:grid;place-items:center;background:#fff}
+    .brandmini img{width:100%;height:100%;object-fit:cover}
+    nav{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+    .tabbtn{padding:10px 14px;border:1px solid var(--border);border-radius:12px;background:#f3f4f6;color:#111;cursor:pointer;font-weight:600}
+    .tabbtn[aria-current="page"]{background:#fff;box-shadow:var(--shadow)}
+    .cart-chip{margin-left:8px;color:var(--muted);font-variant-numeric:tabular-nums}
+    .container{max-width:1100px;margin:0 auto;padding:24px 16px}
+    .home{min-height:calc(100dvh - 70px);display:grid;place-items:center;text-align:center}
+    .home-inner{max-width:900px}
+    .logo-wrap{display:grid;place-items:center;margin:10px auto}
+    .logo{width:min(92vw,760px);height:auto;display:block;filter:drop-shadow(0 8px 20px rgba(0,0,0,.08))}
+    .slogan{margin-top:14px;font-size:clamp(16px,2.6vw,24px);color:var(--muted);letter-spacing:.2px}
+    .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+    @media (max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}
+    @media (max-width:560px){.grid{grid-template-columns:1fr}}
+    .card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;display:flex;flex-direction:column;gap:12px}
+    .thumb{width:100%;aspect-ratio:4/3;border-radius:14px;overflow:hidden;background:#f7f7f7;border:1px dashed #d1d5db;display:grid;place-items:center;font-size:12px;color:var(--muted)}
+    .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+    .thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+    .thumbs .mini{width:60px;height:46px;border-radius:8px;border:1px solid var(--border);overflow:hidden;background:#f7f7f7;display:grid;place-items:center;position:relative}
+    .thumbs .mini img{width:100%;height:100%;object-fit:cover}
+    .thumbs .mini button{position:absolute;top:2px;right:2px;border:none;background:rgba(0,0,0,.6);color:#fff;border-radius:6px;height:20px;width:20px;line-height:20px;cursor:pointer}
+    .title{font-size:18px;font-weight:700}
+    .price{font-size:16px;color:var(--muted)}
+    .row{display:flex;gap:8px;align-items:center}
+    .row .grow{flex:1}
+    .btn{padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:#f3f4f6;color:#111;cursor:pointer}
+    .btn.primary{background:#111111;color:#ffffff;font-weight:700;border-color:#111111}
+    .btn.ghost{background:transparent}
+    .small{font-size:12px;color:var(--muted)}
+    .editor{display:none;gap:8px}
+    .editor.active{display:grid}
+    .field{display:grid;gap:6px}
+    .field input{padding:10px;border-radius:10px;border:1px solid var(--border);background:#fff;color:var(--text)}
+    form{display:grid;gap:12px;max-width:640px}
+    label{font-size:14px;color:var(--muted)}
+    input, textarea{padding:12px;border-radius:12px;border:1px solid var(--border);background:#fff;color:var(--text)}
+    textarea{min-height:140px;resize:vertical}
+    footer{border-top:1px solid var(--border);margin-top:40px}
+    .foot{max-width:1100px;margin:0 auto;padding:18px 16px;color:var(--muted);font-size:13px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+    .is-hidden{display:none !important}
+    .cart{position:fixed;inset:0;z-index:60}
+    .cart-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.2)}
+    .cart-drawer{position:absolute;right:0;top:0;height:100%;width:min(440px,100%);background:#fff;border-left:1px solid var(--border);display:flex;flex-direction:column;box-shadow:-6px 0 20px rgba(0,0,0,.06)}
+    .cart-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border)}
+    .cart-items{padding:10px 12px;overflow:auto;flex:1;display:grid;gap:10px}
+    .cart-item{display:grid;grid-template-columns:72px 1fr auto;gap:10px;align-items:center;border:1px solid var(--border);border-radius:12px;padding:8px}
+    .ci-thumb{width:72px;height:54px;border-radius:8px;overflow:hidden;background:#f7f7f7;border:1px dashed #d1d5db;display:grid;place-items:center;color:var(--muted);font-size:12px}
+    .ci-thumb img{width:100%;height:100%;object-fit:cover}
+    .ci-title{font-weight:700}
+    .ci-price{color:var(--muted);font-size:14px}
+    .ci-qty{display:flex;align-items:center;gap:8px;margin-top:6px}
+    .qtybtn{width:30px;height:30px;border-radius:8px;border:1px solid var(--border);background:#f3f4f6;color:#111;cursor:pointer}
+    .cart-foot{border-top:1px solid var(--border);padding:12px 14px;display:grid;gap:8px}
+    .contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+    @media (max-width:900px){.contact-grid{grid-template-columns:1fr}}
+    .contact-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px}
+    .socials{display:grid;gap:10px}
+    .socials .small{display:none}
+    .iconlink{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:12px;padding:10px 12px;background:#fff;cursor:pointer}
+    .iconlink svg{width:18px;height:18px;flex:0 0 auto}
+    .req::after{content:' *';color:#ff6464}
+    .contact-card form{max-width:520px}
+    .contact-form input,.contact-form textarea{width:100%;border-radius:14px;padding:12px 14px;border:1px solid var(--border);background:#fff;color:var(--text);font-size:16px;line-height:1.4}
+    .contact-form input{height:48px}
+    .contact-form textarea{min-height:160px}
+    .contact-form .consent{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--muted)}
+    .contact-form .consent input{width:18px;height:18px;margin-top:3px}
+    .contact-form .btn.primary{width:100%;border:0}
+    .panel{position:fixed;inset:0;z-index:70}
+    .panel-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.2)}
+    .panel-drawer{position:absolute;right:0;top:0;height:100%;width:min(560px,100%);background:#fff;border-left:1px solid var(--border);display:flex;flex-direction:column;box-shadow:-6px 0 20px rgba(0,0,0,.06)}
+    .panel-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border)}
+    .panel-body{padding:14px 16px;overflow:auto;display:grid;gap:14px}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    @media (max-width:720px){.grid-2{grid-template-columns:1fr}}
+    .preview{border:1px solid var(--border);border-radius:12px;padding:10px;display:grid;gap:8px;background:#fff}
+    .preview img{width:100%;max-height:220px;object-fit:contain;background:#fff;border-radius:10px}
+    .lang{display:flex;gap:6px;margin-left:8px}
+    .lang .tabbtn{padding:8px 10px}
+    .lang .tabbtn[aria-pressed="true"]{background:#111;color:#fff}
+  
+  /* Hide Settings tab for guests; show only in admin mode */
+  #openSettings{display:none !important;}
+  body.is-admin #openSettings{display:inline-flex !important;}
+
+  </style>
+</head>
+<body>
+  <header>
+    <div class="bar">
+      <a class="brandmini" href="#home" title="Stick It On">
+        <img id="miniLogo" alt="logo" src="logo-icon.png" data-default="logo-icon.png" />
+      </a>
+      <nav>
+        <a class="tabbtn" id="tabHome" data-tab="home" href="#home">Главная</a>
+        <a class="tabbtn" id="tabProducts" data-tab="products" href="#products">Товары</a>
+        <a class="tabbtn" id="tabContact" data-tab="contact" href="#contact">Контакты</a>
+        <button type="button" class="tabbtn" id="openSettings">Настройки</button>
+        <button type="button" class="tabbtn cart-chip" id="cartOpen"><span id="cartLabel">Корзина</span>: <b id="cartCount">0</b></button>
+        <div class="lang" id="langSwitcher">
+          <button type="button" class="tabbtn" data-lang="ru">RU</button>
+          <button type="button" class="tabbtn" data-lang="uk">УКР</button>
+          <button type="button" class="tabbtn" data-lang="en">EN</button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="container home" data-view="home">
+      <div class="home-inner">
+        <div class="logo-wrap">
+          <img id="bigLogo" class="logo" src="logo-big.png" data-default="logo-big.png" alt="Stick It On logo" />
+        </div>
+        <p class="slogan" id="slogan">Hide the warning. Show your style</p>
+      </div>
+    </section>
+
+    <section class="container is-hidden" data-view="products">
+      <h2 id="productsTitle" style="margin:4px 0 16px">Товары</h2>
+      <div id="grid" class="grid"></div>
+      <p class="small" id="productsHint">Подсказка: нажмите ⌘+⇧+A, ⌥+⇧+A или Ctrl+⇧+A, либо быстро три раза нажмите A, или откройте URL с #admin / ?admin=1.</p>
+    </section>
+
+    <section class="container is-hidden" data-view="contact">
+      <h2 id="contactTitle" style="margin:4px 0 16px">Контакты</h2>
+      <div class="contact-grid">
+        <div class="contact-card">
+          <form id="contactForm" class="contact-form" onsubmit="return handleContact(event)">
+            <div>
+              <label class="req" for="c_name">Имя</label>
+              <input id="c_name" name="name" placeholder="Ваше имя" required />
+            </div>
+            <div>
+              <label class="req" for="c_email">Email</label>
+              <input id="c_email" type="email" name="email" placeholder="you@example.com" required />
+            </div>
+            <div>
+              <label for="c_phone">Телефон</label>
+              <input id="c_phone" name="phone" placeholder="+380…" />
+            </div>
+            <div>
+              <label for="c_subject">Тема</label>
+              <input id="c_subject" name="subject" placeholder="Вопрос по заказу / сотрудничество" />
+            </div>
+            <div>
+              <label class="req" for="c_msg">Сообщение</label>
+              <textarea id="c_msg" name="message" placeholder="Коротко опишите ваш запрос" required></textarea>
+            </div>
+            <div class="consent"><input id="c_consent" type="checkbox" required><span id="consentText">Я согласен(на) на обработку персональных данных и получение ответа на email/телефон.</span></div>
+            <button class="btn primary" id="submitBtn" type="submit">Отправить</button>
+          </form>
+        </div>
+        <div class="contact-card">
+          <div class="socials">
+            <a class="iconlink" href="mailto:sales@stickiton.shop" aria-label="Email sales@stickiton.shop">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 6h16a2 2 0 0 1 2 2v.2l-10 6-10-6V8a2 2 0 0 1 2-2Zm-2 4.3v7.7A2 2 0 0 0 4 20h16a2 2 0 0 0 2-2v-7.7l-9.4 5.64a2 2 0 0 1-2.12 0L2 10.3Z"/></svg>
+              <span>sales@stickiton.shop</span>
+            </a>
+            <a class="iconlink" target="_blank" rel="noopener noreferrer" href="https://instagram.com/stickiton.shop" aria-label="Instagram @stickiton.shop">
+              <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><rect x="3" y="3" width="18" height="18" rx="5" ry="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.5" cy="6.5" r="1.2"/></svg>
+              <span>@stickiton.shop</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="settingsPanel" class="panel is-hidden">
+    <div class="panel-backdrop" data-close-settings></div>
+    <div class="panel-drawer">
+      <div class="panel-head">
+        <h3 style="margin:0">Настройки логотипов</h3>
+        <button class="btn" data-close-settings>&times;</button>
+      </div>
+      <div class="panel-body">
+        <div class="grid-2">
+          <div class="preview">
+            <b>Большое лого (главная)</b>
+            <img id="bigPreview" alt="big logo preview" src="" />
+            <div class="field"><label class="small">Файл</label><input id="bigFile" type="file" accept="image/*"></div>
+            <div class="field"><label class="small">Или URL</label><input id="bigUrl" placeholder="https://..."></div>
+          </div>
+          <div class="preview">
+            <b>Маленькое лого (шапка/фавикон)</b>
+            <img id="smallPreview" alt="small logo preview" src="" />
+            <div class="field"><label class="small">Файл</label><input id="smallFile" type="file" accept="image/*"></div>
+            <div class="field"><label class="small">Или URL</label><input id="smallUrl" placeholder="https://..."></div>
+          </div>
+        </div>
+        <div class="row">
+          <button class="btn" id="resetLogos">Сбросить</button>
+          <button class="btn" id="makeDefault">Сделать текущие дефолтом</button>
+          <div class="grow"></div>
+          <button class="btn" id="exportHtml">Экспорт HTML</button>
+          <button class="btn primary" id="saveLogos">Сохранить</button>
+        </div>
+        <div class="small">Логотипы и изображения товаров: большие файлы сохраняются в IndexedDB (а не в localStorage), чтобы избежать ошибок квоты.</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="cartPanel" class="cart is-hidden">
+    <div class="cart-backdrop" data-close></div>
+    <div class="cart-drawer">
+      <div class="cart-head">
+        <h3 id="cartTitle" style="margin:0">Корзина</h3>
+        <button class="btn" data-close>&times;</button>
+      </div>
+      <div id="cartItems" class="cart-items"></div>
+      <div class="cart-foot">
+        <div class="small" id="minOrderLabel">Минимальный заказ: <b>100 грн</b></div>
+        <div class="row">
+          <div class="grow"><b>Итого: <span id="cartTotal">0</span> грн</b></div>
+          <button id="checkoutBtn" class="btn primary" disabled>Оформить</button>
+        </div>
+        <div id="minNote" class="small"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="foot">
+      <div>© <span id="year"></span> Stick It On Shop</div>
+      <div class="small" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+        <a class="iconlink" style="padding:6px 10px" href="mailto:sales@stickiton.shop" aria-label="Email sales@stickiton.shop">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style="width:16px;height:16px"><path d="M4 6h16a2 2 0 0 1 2 2v.2l-10 6-10-6V8a2 2 0 0 1 2-2Zm-2 4.3v7.7A2 2 0 0 0 4 20h16a2 2 0 0 0 2-2v-7.7l-9.4 5.64a2 2 0 0 1-2.12 0L2 10.3Z"/></svg>
+          <span>Email</span>
+        </a>
+        <a class="iconlink" style="padding:6px 10px" target="_blank" rel="noopener noreferrer" href="https://instagram.com/stickiton.shop" aria-label="Instagram @stickiton.shop">
+          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><rect x="3" y="3" width="18" height="18" rx="5" ry="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.5" cy="6.5" r="1.2"/></svg>
+          <span>Instagram</span>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const isDataURI = s => typeof s==='string' && s.startsWith('data:');
+    function fileToDataURL(file){return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(file)})}
+    function dataURLToBlob(dataURL){const [h,b]=dataURL.split(','); const mime=(h.match(/data:([^;]+)/)||[])[1]||'application/octet-stream'; const bin=atob(b||''); const len=bin.length; const u8=new Uint8Array(len); for(let i=0;i<len;i++) u8[i]=bin.charCodeAt(i); return new Blob([u8],{type:mime})}
+    async function fileToSizedDataURL(file, maxDim){ const data=await fileToDataURL(file); return await resizeDataURL(data,maxDim); }
+    async function urlToDataURL(url, maxDim){ const res=await fetch(url,{mode:'cors'}).catch(()=>null); if(!res||!res.ok) return null; const blob=await res.blob(); const data=await fileToDataURL(blob); return await resizeDataURL(data,maxDim); }
+    function resizeDataURL(dataURL, maxDim){
+      return new Promise((resolve)=>{
+        try{
+          const img=new Image(); img.crossOrigin='anonymous';
+          img.onload=()=>{
+            const w=img.width, h=img.height; const scale=Math.min(1, maxDim/Math.max(w,h));
+            if(scale>=1){ resolve(dataURL); return; }
+            const cw=Math.max(1,Math.round(w*scale)); const ch=Math.max(1,Math.round(h*scale));
+            const c=document.createElement('canvas'); c.width=cw; c.height=ch; const ctx=c.getContext('2d');
+            ctx.drawImage(img,0,0,cw,ch); try{ resolve(c.toDataURL('image/png')); } catch(_){ resolve(dataURL); }
+          };
+          img.onerror=()=>resolve(dataURL);
+          img.src=dataURL;
+        }catch(e){ resolve(dataURL); }
+      });
+    }
+    function escapeHtml(s){return String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}
+    function escapeAttr(s){return String(s).replace(/["&<>]/g,c=>({"\"":"&quot;","&":"&amp;","<":"&lt;",">":"&gt;"}[c]))}
+    const MEDIA_DB='sio_media_v1', MEDIA_STORE='product_imgs';
+    const LOGO_DB='sio_db_v1', LOGO_STORE='logos';
+    const _mdp=new Promise(res=>{ if(!('indexedDB' in window)) return res(null); const open=indexedDB.open(MEDIA_DB,1); open.onupgradeneeded=()=>{try{open.result.createObjectStore(MEDIA_STORE)}catch(_){}}; open.onsuccess=()=>res(open.result); open.onerror=()=>res(null); });
+    const _dbp=new Promise(res=>{ if(!('indexedDB' in window)) return res(null); const open=indexedDB.open(LOGO_DB,1); open.onupgradeneeded=()=>{try{open.result.createObjectStore(LOGO_STORE)}catch(_){}}; open.onsuccess=()=>res(open.result); open.onerror=()=>res(null); });
+    function idbPut(dbp,store,k,v){return dbp.then(db=>new Promise(r=>{if(!db) return r(false); const tx=db.transaction(store,'readwrite'); tx.objectStore(store).put(v,k); tx.oncomplete=()=>r(true); tx.onerror=()=>r(false)}))}
+    function idbGet(dbp,store,k){return dbp.then(db=>new Promise(r=>{if(!db) return r(undefined); const tx=db.transaction(store,'readonly'); const rq=tx.objectStore(store).get(k); rq.onsuccess=()=>r(rq.result); rq.onerror=()=>r(undefined)}))}
+    function idbDel(dbp,store,k){return dbp.then(db=>new Promise(r=>{if(!db) return r(false); const tx=db.transaction(store,'readwrite'); tx.objectStore(store).delete(k); tx.oncomplete=()=>r(true); tx.onerror=()=>r(false)}))}
+    async function mediaPutBlob(blob){ const key='p-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8); const ok=await idbPut(_mdp,MEDIA_STORE,key,blob); return ok?('idb:'+key):null }
+    async function mediaGetSrc(ref){
+      if(!ref) return '';
+      if(ref.startsWith('idb:')){ const key=ref.slice(4); const blob=await idbGet(_mdp,MEDIA_STORE,key); if(blob){ return URL.createObjectURL(blob) } return '' }
+      return ref;
+    }
+    const initialProducts=[
+      {id:1,title:'Sticker Pack A',price:149,img:''},
+      {id:2,title:'Sticker Pack B',price:149,img:''},
+      {id:3,title:'Sticker Pack C',price:149,img:''},
+      {id:4,title:'Sticker Pack D',price:149,img:''},
+      {id:5,title:'Sticker Pack E',price:149,img:''},
+      {id:6,title:'Sticker Pack F',price:149,img:''}
+    ], LS_KEY='sio_products_v1';
+    function loadProducts(){
+      try{const r=localStorage.getItem(LS_KEY);return r?JSON.parse(r):initialProducts}catch(e){return initialProducts}
+    }
+    const IMG_DATAURL_LIMIT = 60000;
+    async function migrateLargeDataURIs(list){
+      let changed=false;
+      for(const p of list){
+        if(!Array.isArray(p.imgs)) p.imgs = p.img ? [p.img] : [];
+        for(let i=0;i<p.imgs.length;i++){
+          const ref=p.imgs[i];
+          if(typeof ref==='string' && isDataURI(ref) && ref.length>IMG_DATAURL_LIMIT){
+            try{ const blob=dataURLToBlob(ref); const idref=await mediaPutBlob(blob); if(idref){ p.imgs[i]=idref; if(i===0) p.img=idref; changed=true; } }
+            catch(_){ }
+          }
+        }
+      }
+      if(changed){ try{ localStorage.setItem(LS_KEY,JSON.stringify(list)) } catch(e){ console.warn('Save after migrate failed', e) } }
+      return list;
+    }
+    function safeSaveProducts(list){
+      function stripOversized(arr){ return (arr||[]).map((ref)=> (typeof ref==='string' && isDataURI(ref) && ref.length>IMG_DATAURL_LIMIT ? '' : ref)).filter(Boolean) }
+      try{ localStorage.setItem(LS_KEY,JSON.stringify(list)); return true }
+      catch(e){
+        if(e && String(e).includes('QuotaExceededError')){
+          const slim=list.map(p=>({ ...p, imgs: stripOversized(p.imgs), img: (p.imgs&&p.imgs[0])||'' }));
+          try{ localStorage.setItem(LS_KEY,JSON.stringify(slim)); return true }catch(e2){ return false }
+        }
+        return false;
+      }
+    }
+    let products = loadProducts();
+    const MIN_ORDER=100,LS_CART='sio_cart_v1'; let cart=loadCart();
+    function loadCart(){try{const r=localStorage.getItem(LS_CART);return r?JSON.parse(r):[]}catch(e){return []}}
+    function saveCart(){try{localStorage.setItem(LS_CART,JSON.stringify(cart))}catch(e){}}
+    function getSubtotal(){return cart.reduce((s,i)=>s+Number(i.price||0)*Number(i.qty||0),0)}
+    function updateCartCount(){document.getElementById('cartCount').textContent=cart.reduce((s,i)=>s+(i.qty||0),0)}
+    function addToCart(p){
+      const firstImg = (Array.isArray(p.imgs) && p.imgs[0]) || p.img || '';
+      const i=cart.findIndex(x=>x.id===p.id);
+      if(i>-1){ cart[i].qty+=1; }
+      else { cart.push({id:p.id,title:p.title,price:Number(p.price),img:firstImg,qty:1}); }
+      saveCart(); updateCartCount();
+    }
+    function changeQty(id,d){const i=cart.findIndex(x=>x.id===id); if(i>-1){cart[i].qty=Math.max(0,(cart[i].qty||0)+d); if(cart[i].qty===0)cart.splice(i,1); saveCart(); renderCart(); updateCartCount()}}
+    function removeItem(id){cart=cart.filter(i=>i.id!==id); saveCart(); renderCart(); updateCartCount()}
+    async function resolveAndSetImg(imgEl, ref){
+      const src=await mediaGetSrc(ref);
+      if(!imgEl) return;
+      if(src){ imgEl.src=src; imgEl.alt=imgEl.alt||''; }
+      else { imgEl.removeAttribute('src'); imgEl.closest('.thumb, .mini')?.classList.add('no-img'); }
+    }
+    async function renderCart(){
+      const w=document.getElementById('cartItems'); w.innerHTML='';
+      if(cart.length===0){w.innerHTML='<div class="small">Корзина пуста</div>'}
+      for(const i of cart){
+        const el=document.createElement('div'); el.className='cart-item';
+        const imgTag = `<img alt="" />`;
+        el.innerHTML = `<div class="ci-thumb">${imgTag}</div>
+          <div><div class="ci-title">${escapeHtml(i.title)}</div>
+          <div class="ci-price">${Number(i.price).toLocaleString('uk-UA')} грн</div>
+          <div class="ci-qty"><button class="qtybtn" data-dec>-</button><span>${i.qty}</span><button class="qtybtn" data-inc>+</button></div></div>
+          <button class="btn ghost" data-remove>Удалить</button>`;
+        el.querySelector('[data-dec]').onclick=()=>changeQty(i.id,-1);
+        el.querySelector('[data-inc]').onclick=()=>changeQty(i.id,1);
+        el.querySelector('[data-remove]').onclick=()=>removeItem(i.id);
+        const imgEl=el.querySelector('img');
+        resolveAndSetImg(imgEl, i.img);
+        w.appendChild(el)
+      }
+      const sum=getSubtotal();
+      document.getElementById('cartTotal').textContent=sum.toLocaleString('uk-UA');
+      const ok=sum>=MIN_ORDER; document.getElementById('checkoutBtn').disabled=!ok;
+      document.getElementById('minNote').textContent=ok?'':`Добавьте ещё ${(MIN_ORDER-sum).toFixed(0)} грн до минимального заказа.`
+    }
+    function openCart(){document.getElementById('cartPanel').classList.remove('is-hidden'); renderCart()}
+    function closeCart(){document.getElementById('cartPanel').classList.add('is-hidden')}
+    const tabs=['home','products','contact'];
+    function showTab(n){tabs.forEach(t=>{const el=document.querySelector(`[data-view="${t}"]`); const btn=document.querySelector(`.tabbtn[data-tab="${t}"]`); if(!el||!btn)return; const a=t===n; el.classList.toggle('is-hidden',!a); btn.setAttribute('aria-current',a?'page':'false')})}
+    function applyHash(){const raw=(location.hash||'').replace('#',''); const h=tabs.includes(raw)?raw:'home'; if(!location.hash||!tabs.includes(raw))location.hash='#'+h; showTab(h)}
+    const LS_LOGO_BIG='sio_logo_big_meta', LS_LOGO_SMALL='sio_logo_small_meta';
+    const DEF_BIG_URL='sio_def_big_url', DEF_SMALL_URL='sio_def_small_url';
+    function mkMeta(kind,value){return JSON.stringify({kind,value,t:Date.now()})}
+    function readMeta(str){try{return str?JSON.parse(str):null}catch(e){return null}}
+    async function resolveLogoSrc(meta,def,which){
+      if(!meta) return def;
+      if(meta.kind==='url' && meta.value) return meta.value;
+      if(meta.kind==='idb'){
+        const blob=await idbGet(_dbp,LOGO_STORE,which);
+        if(blob){ const data=await new Promise((res,rej)=>{const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(blob)}); return data; }
+      }
+      return def;
+    }
+    function ensureFavicon(){let link=document.querySelector('link[rel="icon"]'); if(!link){link=document.createElement('link'); link.rel='icon'; document.head.appendChild(link)} return link}
+    async function applyLogos(){
+      try{ const ob=localStorage.getItem('sio_logo_big'); if(ob&&isDataURI(ob)) localStorage.removeItem('sio_logo_big'); const os=localStorage.getItem('sio_logo_small'); if(os&&isDataURI(os)) localStorage.removeItem('sio_logo_small'); }catch(e){}
+      let bigDef=document.getElementById('bigLogo').dataset.default||'logo-big.png';
+      let smallDef=document.getElementById('miniLogo').dataset.default||'logo-icon.png';
+      const defBigOverride=localStorage.getItem(DEF_BIG_URL); const defSmallOverride=localStorage.getItem(DEF_SMALL_URL);
+      if(defBigOverride) bigDef=defBigOverride;
+      if(defSmallOverride) smallDef=defSmallOverride;
+      const bigMeta=readMeta(localStorage.getItem(LS_LOGO_BIG)); const smallMeta=readMeta(localStorage.getItem(LS_LOGO_SMALL));
+      const bigSrc=await resolveLogoSrc(bigMeta,bigDef,'big'); const smallSrc=await resolveLogoSrc(smallMeta,smallDef,'small');
+      document.getElementById('bigLogo').src=bigSrc; document.getElementById('miniLogo').src=smallSrc;
+      const fav=ensureFavicon(); fav.type='image/png'; fav.href=smallSrc;
+      const bp=document.getElementById('bigPreview'); if(bp) bp.src=bigSrc;
+      const sp=document.getElementById('smallPreview'); if(sp) sp.src=smallSrc;
+    }
+    async function saveLogosFromUI(){
+      const bf=document.getElementById('bigFile').files[0];
+      const sf=document.getElementById('smallFile').files[0];
+      const bu=document.getElementById('bigUrl').value.trim();
+      const su=document.getElementById('smallUrl').value.trim();
+      if(bf){
+        const data=await fileToSizedDataURL(bf,1400);
+        if(data && data.length<120000){ localStorage.setItem(LS_LOGO_BIG,mkMeta('url',data)); }
+        else { const ok=await idbPut(_dbp,LOGO_STORE,'big',bf); if(ok){ localStorage.setItem(LS_LOGO_BIG,mkMeta('idb','big')); } else { alert('Не удалось сохранить большой логотип. Используйте URL.'); } }
+      } else if(bu){
+        try{ const data=await urlToDataURL(bu,1400); if(data && data.length<120000){ localStorage.setItem(LS_LOGO_BIG,mkMeta('url',data)); } else { localStorage.setItem(LS_LOGO_BIG,mkMeta('url',bu)); } }
+        catch{ localStorage.setItem(LS_LOGO_BIG,mkMeta('url',bu)); }
+      }
+      if(sf){
+        const data=await fileToSizedDataURL(sf,512);
+        if(data && data.length<120000){ localStorage.setItem(LS_LOGO_SMALL,mkMeta('url',data)); }
+        else { const ok2=await idbPut(_dbp,LOGO_STORE,'small',sf); if(ok2){ localStorage.setItem(LS_LOGO_SMALL,mkMeta('idb','small')); } else { alert('Не удалось сохранить иконку. Используйте URL.'); } }
+      } else if(su){
+        try{ const data=await urlToDataURL(su,512); if(data && data.length<120000){ localStorage.setItem(LS_LOGO_SMALL,mkMeta('url',data)); } else { localStorage.setItem(LS_LOGO_SMALL,mkMeta('url',su)); } }
+        catch{ localStorage.setItem(LS_LOGO_SMALL,mkMeta('url',su)); }
+      }
+    }
+    const LANG_KEY='sio_lang';
+    const dict={
+      ru:{tab_home:'Главная',tab_products:'Товары',tab_contact:'Контакты',settings:'Настройки',cart:'Корзина',slogan:'Hide the warning. Show your style',products_title:'Товары',products_hint:'Подсказка: нажмите ⌘+⇧+A, ⌥+⇧+A или Ctrl+⇧+A, либо быстро три раза нажмите A, или откройте URL с #admin / ?admin=1.',contact_title:'Контакты',name_label:'Название',price_label:'Цена (грн)',img_file:'Изображение (файл)',img_url:'или URL изображения',cancel:'Отмена',save:'Сохранить',add_to_cart:'В корзину',edit:'Изменить',min_order_label:'Минимальный заказ: <b>100 грн</b>',checkout:'Оформить',cart_title:'Корзина',cart_empty:'Корзина пуста',remove:'Удалить',send:'Отправить',consent:'Я согласен(на) на обработку персональных данных и получение ответа на email/телефон.',min_order_alert:'Минимальный заказ 100 грн',thanks_order:'Спасибо за заказ! Итого:',logos_reset:'Логотипы и дефолты сброшены',saved:'Сохранено. Логотипы обновлены.',save_fail:'Не удалось сохранить. Попробуйте меньший файл или URL.',set_as_default:'Текущие логотипы установлены как дефолтные.',default_fail:'Не удалось сохранить дефолты. Попробуйте указать URL в настройках.'},
+      uk:{tab_home:'Головна',tab_products:'Товари',tab_contact:'Контакти',settings:'Налаштування',cart:'Кошик',slogan:'Hide the warning. Show your style',products_title:'Товари',products_hint:'Підказка: натисніть «Змінити» на картці — з’являться поля для назви, ціни (грн) та завантаження картинки. Дані зберігаються локально (localStorage/IndexedDB) лише на цьому пристрої.',contact_title:'Контакти',name_label:'Назва',price_label:'Ціна (грн)',img_file:'Зображення (файл)',img_url:'або URL зображення',cancel:'Скасувати',save:'Зберегти',add_to_cart:'До кошика',edit:'Змінити',min_order_label:'Мінімальне замовлення: <b>100 грн</b>',checkout:'Оформити',cart_title:'Кошик',cart_empty:'Кошик порожній',remove:'Видалити',send:'Надіслати',consent:'Погоджуюсь на обробку персональних даних і отримання відповіді на email/телефон.',min_order_alert:'Мінімальне замовлення 100 грн',thanks_order:'Дякуємо за замовлення! Разом:',logos_reset:'Логотипи та дефолти скинуто',saved:'Збережено. Логотипи оновлено.',save_fail:'Не вдалося зберегти. Спробуйте менший файл або URL.',set_as_default:'Поточні логотипи встановлено як дефолтні.',default_fail:'Не вдалося зберегти дефолти. Вкажіть URL у налаштуваннях.'},
+      en:{tab_home:'Home',tab_products:'Products',tab_contact:'Contact',settings:'Settings',cart:'Cart',slogan:'Hide the warning. Show your style',products_title:'Products',products_hint:'Tip: click “Edit” on a card to change the name, price (UAH), and image. Data is stored locally (localStorage/IndexedDB) on this device only.',contact_title:'Contact',name_label:'Name',price_label:'Price (UAH)',img_file:'Image (file)',img_url:'or Image URL',cancel:'Cancel',save:'Save',add_to_cart:'Add to cart',edit:'Edit',min_order_label:'Minimum order: <b>100 UAH</b>',checkout:'Checkout',cart_title:'Cart',cart_empty:'Cart is empty',remove:'Remove',send:'Send',consent:'I agree to personal data processing and to receive a response via email/phone.',min_order_alert:'Minimum order is 100 UAH',thanks_order:'Thank you for your order! Total:',logos_reset:'Logos and defaults reset',saved:'Saved. Logos updated.',save_fail:'Failed to save. Try a smaller file or a URL.',set_as_default:'Current logos set as default.',default_fail:'Failed to save defaults. Try specifying a URL.'}
+    };
+    let LANG=localStorage.getItem(LANG_KEY)||'ru';
+    function t(k){return (dict[LANG]&&dict[LANG][k])||(dict.ru[k]||k)}
+    function setLang(l){LANG=l;localStorage.setItem(LANG_KEY,l);applyI18nStatic();applyI18nDynamic();}
+    function initI18n(){document.querySelectorAll('#langSwitcher [data-lang]').forEach(btn=>{btn.addEventListener('click',()=>setLang(btn.dataset.lang))});applyI18nStatic();applyI18nDynamic()}
+    function markActiveLang(){document.querySelectorAll('#langSwitcher [data-lang]').forEach(btn=>btn.setAttribute('aria-pressed',String(btn.dataset.lang===LANG)))}
+    function applyI18nStatic(){
+      const byId=(id,fn)=>{const el=document.getElementById(id); if(el) fn(el)};
+      byId('tabHome',el=>el.textContent=t('tab_home'));
+      byId('tabProducts',el=>el.textContent=t('tab_products'));
+      byId('tabContact',el=>el.textContent=t('tab_contact'));
+      byId('openSettings',el=>el.textContent=t('settings'));
+      byId('cartLabel',el=>el.textContent=t('cart'));
+      byId('slogan',el=>el.textContent=t('slogan'));
+      byId('productsTitle',el=>el.textContent=t('products_title'));
+      byId('productsHint',el=>el.textContent=t('products_hint'));
+      byId('contactTitle',el=>el.textContent=t('contact_title'));
+      byId('cartTitle',el=>el.textContent=t('cart_title'));
+      byId('checkoutBtn',el=>el.textContent=t('checkout'));
+      byId('minOrderLabel',el=>el.innerHTML=t('min_order_label'));
+      byId('submitBtn',el=>el.textContent=t('send'));
+      byId('consentText',el=>el.textContent=t('consent'));
+      byId('c_name',el=>el.placeholder = LANG==='en'?'Your name':(LANG==='uk'?'Ваше ім’я':'Ваше имя'));
+      byId('c_email',el=>el.placeholder = 'you@example.com');
+      byId('c_phone',el=>el.placeholder = '+380…');
+      byId('c_subject',el=>el.placeholder = LANG==='en'?'Order question / partnership':(LANG==='uk'?'Питання щодо замовлення / співпраця':'Вопрос по заказу / сотрудничество'));
+      byId('c_msg',el=>el.placeholder = LANG==='en'?'Briefly describe your request':(LANG==='uk'?'Коротко опишіть ваш запит':'Коротко опишите ваш запрос'));
+      markActiveLang();
+    }
+    function applyI18nDynamic(){
+      document.querySelectorAll('[data-editor] label.small').forEach(el=>{ const key=el.getAttribute('data-i18n'); if(key) el.textContent=t(key); });
+      document.querySelectorAll('[data-editor] [data-save]').forEach(el=>el.textContent=t('save'));
+      document.querySelectorAll('[data-editor] [data-cancel]').forEach(el=>el.textContent=t('cancel'));
+      document.querySelectorAll('[data-add]').forEach(el=>el.textContent=t('add_to_cart'));
+      document.querySelectorAll('[data-edit]').forEach(el=>el.textContent=t('edit'));
+      markActiveLang();
+    }
+    document.addEventListener('DOMContentLoaded',async()=>{
+      document.querySelectorAll('.tabbtn').forEach(a=>{a.addEventListener('click',e=>{const t=a.getAttribute('data-tab'); if(!t)return; e.preventDefault(); location.hash='#'+t; showTab(t)})});
+      applyHash();
+      initI18n();
+      products=loadProducts();
+      products = products.map(p=>({ ...p, imgs: Array.isArray(p.imgs) ? p.imgs : (p.img ? [p.img] : []) }));
+      await migrateLargeDataURIs(products);
+      safeSaveProducts(products);
+      async function renderProductsUI(){
+        const g=document.getElementById('grid'); g.innerHTML='';
+        for(const p of products){
+          const c=document.createElement('article'); c.className='card';
+          const imgs = Array.isArray(p.imgs)? p.imgs : (p.img? [p.img]: []);
+          const mainRef = imgs[0]||'';
+          const thumbsHTML = imgs.length ? `<div class="thumbs">${imgs.map((src,idx)=>`<div class="mini"><img alt=""/><button title="Удалить" data-remove-idx="${idx}">×</button></div>`).join('')}</div>` : `<div class="thumbs"></div>`;
+          c.innerHTML = `<div class="thumb"><img alt="${escapeAttr(p.title)}"/></div>
+            ${thumbsHTML}
+            <div class="title">${escapeHtml(p.title)}</div>
+            <div class="row"><div class="price">${Number(p.price).toLocaleString('uk-UA')} грн</div></div>
+            <div class="row"><button class="btn primary" data-add>В корзину</button><button class="btn ghost" data-edit>Изменить</button></div>
+            <div class="editor" data-editor>
+              <div class="field"><label class="small">Название</label><input data-title value="${escapeAttr(p.title)}"></div>
+              <div class="field"><label class="small">Цена (грн)</label><input data-price type="number" min="0" step="1" value="${Number(p.price)}"></div>
+              <div class="field"><label class="small">Фотографии (файлы, можно несколько)</label><input data-files type="file" accept="image/*" multiple></div>
+              <div class="field"><label class="small">или URL (по одному в строке)</label><textarea data-urls placeholder="https://...\nhttps://..."></textarea></div>
+              <div class="row"><button class="btn" data-clear>Очистить фото</button><div class="grow"></div><button class="btn" data-cancel>Отмена</button><button class="btn primary" data-save>Сохранить</button></div>
+            </div>`;
+          const mainImg=c.querySelector('.thumb img'); resolveAndSetImg(mainImg, mainRef);
+          c.querySelectorAll('.thumbs .mini').forEach(async (miniEl,idx)=>{ const im=miniEl.querySelector('img'); resolveAndSetImg(im, imgs[idx]); });
+          c.querySelector('[data-add]').onclick=()=>addToCart(p);
+          const ed=c.querySelector('[data-editor]');
+          c.querySelector('[data-edit]').onclick=()=>ed.classList.add('active');
+          c.querySelector('[data-cancel]').onclick=()=>ed.classList.remove('active');
+          c.querySelector('[data-clear]').onclick=()=>{ p.imgs=[]; p.img=''; safeSaveProducts(products); renderProductsUI(); };
+          c.querySelectorAll('[data-remove-idx]').forEach(btn=>{
+            btn.addEventListener('click', (e)=>{ e.stopPropagation(); const idx=Number(btn.getAttribute('data-remove-idx')); p.imgs.splice(idx,1); if(idx===0) p.img=p.imgs[0]||''; safeSaveProducts(products); renderProductsUI(); });
+          });
+          c.querySelector('[data-save]').onclick=async()=>{
+            const nt=c.querySelector('[data-title]').value.trim()||p.title;
+            const np=Math.max(0,Number(c.querySelector('[data-price]').value||p.price));
+            const urlText=c.querySelector('[data-urls]').value.trim();
+            const files=c.querySelector('[data-files]').files;
+            const newRefs=[];
+            if(files && files.length){
+              for(const f of files){
+                const data=await fileToSizedDataURL(f, 1600);
+                const blob = isDataURI(data)? dataURLToBlob(data) : f;
+                const idref = await mediaPutBlob(blob);
+                if(idref) newRefs.push(idref);
+              }
+            }
+            if(urlText){ const lines=urlText.split(/\n+/).map(s=>s.trim()).filter(Boolean); newRefs.push(...lines); }
+            const imgsNext = [...(p.imgs||[]), ...newRefs];
+            const idx=products.findIndex(x=>x.id===p.id);
+            products[idx]={...p,title:nt,price:np,imgs:imgsNext,img:imgsNext[0]||''};
+            safeSaveProducts(products); renderProductsUI(); applyI18nDynamic();
+          };
+          g.appendChild(c)
+        }
+      }
+      window.renderProducts=()=>{products=loadProducts(); products = products.map(p=>({...p, imgs:Array.isArray(p.imgs)?p.imgs:(p.img?[p.img]:[])})); renderProductsUI(); applyI18nDynamic()};
+      await renderProductsUI(); applyI18nDynamic();
+      updateCartCount();
+      document.getElementById('cartOpen').addEventListener('click',openCart);
+      document.querySelectorAll('#cartPanel [data-close]').forEach(x=>x.addEventListener('click',closeCart));
+      document.addEventListener('keydown',e=>{if(e.key==='Escape')closeCart()});
+      document.getElementById('checkoutBtn').addEventListener('click',()=>{
+        const total=getSubtotal(); if(total<MIN_ORDER){alert(t('min_order_alert'));return}
+        alert(t('thanks_order')+' '+total.toLocaleString('uk-UA')+' грн');
+        cart=[]; saveCart(); updateCartCount(); renderCart(); closeCart()
+      });
+      function openSettings(){document.getElementById('settingsPanel').classList.remove('is-hidden'); applyLogos()}
+      function closeSettings(){document.getElementById('settingsPanel').classList.add('is-hidden')}
+      document.getElementById('openSettings').addEventListener('click',openSettings);
+      document.querySelectorAll('[data-close-settings]').forEach(x=>x.addEventListener('click',closeSettings));
+      document.getElementById('resetLogos').addEventListener('click',async()=>{
+        localStorage.removeItem(LS_LOGO_BIG); localStorage.removeItem(LS_LOGO_SMALL);
+        localStorage.removeItem(DEF_BIG_URL); localStorage.removeItem(DEF_SMALL_URL);
+        await idbDel(_dbp,LOGO_STORE,'big'); await idbDel(_dbp,LOGO_STORE,'small'); applyLogos(); alert(t('logos_reset'))
+      });
+      document.getElementById('saveLogos').addEventListener('click', async ()=>{
+        try{ await saveLogosFromUI(); await applyLogos(); closeSettings(); alert(t('saved')) }
+        catch(e){ alert(t('save_fail')) }
+      });
+      document.getElementById('makeDefault').addEventListener('click', async ()=>{
+        const bigSrc=document.getElementById('bigLogo').src;
+        const smallSrc=document.getElementById('miniLogo').src;
+        try{ localStorage.setItem(DEF_BIG_URL,bigSrc.startsWith('data:')?'':bigSrc); localStorage.setItem(DEF_SMALL_URL,smallSrc.startsWith('data:')?'':smallSrc); await applyLogos(); alert(t('set_as_default')) }
+        catch(e){ alert(t('default_fail')) }
+      });
+      document.getElementById('exportHtml').addEventListener('click', async ()=>{
+        try{
+          const html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+          const blob = new Blob([html], {type:'text/html'});
+          const fileName = 'stickiton-standalone.html';
+          if (window.navigator && 'msSaveOrOpenBlob' in window.navigator) {
+            window.navigator.msSaveOrOpenBlob(blob, fileName);
+            return;
+          }
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url; a.download = fileName; a.rel = 'noopener'; a.target = '_blank';
+          document.body.appendChild(a); a.click(); a.remove();
+          setTimeout(()=>URL.revokeObjectURL(url), 3000);
+        }catch(err){
+          try{
+            const html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+            const w = window.open('', '_blank');
+            if(w && w.document){ w.document.open('text/html'); w.document.write(html); w.document.close(); }
+            else {
+              const dataUrl = 'data:text/html;charset=utf-8,' + encodeURIComponent(html);
+              const a=document.createElement('a'); a.href=dataUrl; a.download='stickiton-standalone.html'; document.body.appendChild(a); a.click(); a.remove();
+            }
+          }catch(e){ alert('Не удалось выполнить экспорт. Разрешите всплывающие окна или попробуйте другой браузер.'); }
+        }
+      });
+      const bigImg=document.getElementById('bigLogo');
+      const smallImg=document.getElementById('miniLogo');
+      const fallbackOnce=(img)=>{ if(img.dataset.fallbackDone) return; img.dataset.fallbackDone='1'; applyLogos() };
+      bigImg.addEventListener('error',()=>fallbackOnce(bigImg));
+      smallImg.addEventListener('error',()=>fallbackOnce(smallImg));
+      if(!bigImg.complete || bigImg.naturalWidth===0){fallbackOnce(bigImg)}
+      if(!smallImg.complete || smallImg.naturalWidth===0){fallbackOnce(smallImg)}
+      window.handleContact=(e)=>{ e.preventDefault();
+        const name=document.getElementById('c_name').value.trim();
+        const email=document.getElementById('c_email').value.trim();
+        const phone=document.getElementById('c_phone').value.trim();
+        const subject=document.getElementById('c_subject').value.trim();
+        const msg=document.getElementById('c_msg').value.trim();
+        const ok=/.+@.+\..+/.test(email);
+        if(!name||!ok||!msg){alert('Проверьте поля: имя, корректный email и сообщение.');return false}
+        const summary=`Имя: ${name}\nEmail: ${email}\nТелефон: ${phone||'-'}\nТема: ${subject||'-'}\nСообщение: ${msg}`;
+        alert('Сообщение отправлено!\n\n'+summary); e.target.reset(); return false;
+      };
+      document.getElementById('year').textContent=new Date().getFullYear();
+      applyLogos();
+      document.addEventListener('click',(e)=>{
+        const a=e.target.closest('a'); if(!a) return; const href=a.getAttribute('href')||'';
+        if(href.startsWith('mailto:')){ e.preventDefault(); try{ window.location.href=href; } catch(_){ try{ window.open(href,'_self'); }catch(__){} } return; }
+        if(/^(https?:)?\/\/(www\.)?instagram\.com\//i.test(href)){ e.preventDefault(); try{ window.open(href,'_blank'); } catch(_){ location.href=href; } }
+      });
+      runDevTests();
+      applyHash();
+    });
+    function runDevTests(){
+      const results=[];
+      try{
+        const okSections=!!document.querySelector('[data-view="home"]')&&!!document.querySelector('[data-view="products"]')&&!!document.querySelector('[data-view="contact"]');
+        results.push(['Sections exist',okSections]);
+        showTab('products'); const prodVisible=!document.querySelector('[data-view="products"]').classList.contains('is-hidden'); results.push(['Tab switch to products',prodVisible]);
+        const before=getSubtotal(); const testItem={id:999999,title:'TEST_ITEM',price:50,img:''}; addToCart(testItem); addToCart(testItem); const subtotal=getSubtotal(); const minOk=subtotal-before>=100; results.push(['Cart min 100 грн',minOk]); removeItem(999999);
+        const p0=products[0];
+        const beforeLen = (p0.imgs||[]).length;
+        const testAdd = [...(p0.imgs||[]), 'data:image/png;base64,iVBORw0KGgo='];
+        products[0] = {...p0, imgs:testAdd, img:testAdd[0]}; safeSaveProducts(products);
+        const afterLen = loadProducts()[0].imgs.length;
+        results.push(['Multiple images appended', afterLen===beforeLen+1]);
+        const bigData='data:image/png;base64,'+ 'A'.repeat(120000);
+        products[0].imgs.push(bigData); safeSaveProducts(products);
+        migrateLargeDataURIs(products).then(()=>{
+          const imgsNow = loadProducts()[0].imgs;
+          const migratedOk = imgsNow.some(ref=> typeof ref==='string' && ref.startsWith('idb:'));
+          console.log('✅ IDB migrate', migratedOk);
+        });
+        const metaStr=mkMeta('url','https://example.com/logo.png'); results.push(['Logo meta small size', metaStr.length<512 && !isDataURI(metaStr)]);
+        const footerIconsOk=!!document.querySelector('footer .iconlink svg'); results.push(['Footer icons exist', footerIconsOk]);
+        const hasMail=document.querySelector('footer a[href^="mailto:"]')!==null; const hasInsta=document.querySelector('footer a[href*="instagram.com"]')!==null; results.push(['Footer mailto exists',hasMail]); results.push(['Footer instagram exists',hasInsta]);
+        results.push(['applyLogos defined', typeof applyLogos==='function']);
+        results.push(['saveLogosFromUI defined', typeof saveLogosFromUI==='function']);
+        results.push(['export button exists', !!document.getElementById('exportHtml')]);
+        results.push(['lang switch has 3 buttons', document.querySelectorAll('#langSwitcher [data-lang]').length===3]);
+        const bigHasSrc = !!document.getElementById('bigLogo').getAttribute('src');
+        const miniHasSrc = !!document.getElementById('miniLogo').getAttribute('src');
+        results.push(['Big logo has src', bigHasSrc]);
+        results.push(['Mini logo has src', miniHasSrc]);
+        const gridEl=document.getElementById('grid');
+        results.push(['Grid renders some items', gridEl.children.length>=0]);
+      }catch(e){ results.push(['Test runtime error',false,String(e)]); }
+      console.log('%cDEV TESTS','background:#222;color:#fff;padding:3px 6px;border-radius:4px');
+      results.forEach(([n,ok,ex])=>console.log((ok?'✅':'❌')+' '+n,ex||''));
+    }
+  </script>
+
+  <!-- === Admin Mode UI (injected) === -->
+  <style>
+    .admin-only{display:none !important}
+    body.is-admin .admin-only{display:initial !important}
+    .admin-dock{
+      position:fixed; right:14px; bottom:14px; z-index:90;
+      display:flex; gap:8px; flex-wrap:wrap;
+    }
+    .admin-chip{
+      background:#111;color:#fff;border-radius:14px; padding:10px 12px;
+      box-shadow:0 10px 30px rgba(0,0,0,.18); border:1px solid #000;
+      font-size:13px; display:flex; align-items:center; gap:8px;
+      cursor:default;
+    }
+    .admin-dock .btn{background:#fff}
+    .panel .panel-drawer .small.muted{color:#777}
+    .login-card{background:#fff;border:1px solid #e5e7eb;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.08);padding:16px;max-width:360px;margin:80px auto}
+  </style>
+
+  <div id="adminDock" class="admin-dock admin-only" aria-live="polite">
+    <div class="admin-chip">Admin</div>
+    <button class="btn" id="admExport">Экспорт JSON</button>
+    <button class="btn" id="admImport">Импорт JSON</button>
+    <button class="btn" id="admLogout">Выйти</button>
+    <input type="file" id="admImportFile" accept="application/json" class="is-hidden" />
+  </div>
+
+  <div id="adminLogin" class="panel is-hidden" role="dialog" aria-modal="true" aria-labelledby="admTitle">
+    <div class="panel-backdrop" data-close-login></div>
+    <div class="panel-drawer">
+      <div class="panel-head">
+        <h3 id="admTitle" style="margin:0">Вход администратора</h3>
+        <button class="btn" data-close-login>&times;</button>
+      </div>
+      <div class="panel-body">
+        <div class="login-card">
+          <form id="admForm">
+            <div class="field">
+              <label class="small">Пароль</label>
+              <input id="admPass" type="password" placeholder="Введите пароль" autocomplete="current-password" />
+            </div>
+            <div class="row">
+              <div class="grow"></div>
+              <button type="button" class="btn" id="admCancel">Отмена</button>
+              <button type="submit" class="btn primary">Войти</button>
+            </div>
+            <div class="small muted" style="margin-top:8px">Подсказка: нажмите ⌘+⇧+A, ⌥+⇧+A или Ctrl+⇧+A, либо быстро три раза нажмите A, или откройте URL с #admin / ?admin=1.</div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      const ADMIN_PASSWORD = "110620"; // поменяйте!
+      const LS_ADMIN = "sio_admin_ok";
+      const LS_KEY = "sio_products_v1"; // тот же ключ, что и в основном коде
+
+      let isAdmin = localStorage.getItem(LS_ADMIN) === "1";
+
+      const loginPanel = document.getElementById('adminLogin');
+      const admDock = document.getElementById('adminDock');
+
+      function showLogin(){ loginPanel.classList.remove('is-hidden'); setTimeout(()=>document.getElementById('admPass').focus(), 10) }
+      function hideLogin(){ loginPanel.classList.add('is-hidden') }
+
+      function applyAdminUI(){
+        document.body.classList.toggle('is-admin', !!isAdmin);
+        if(admDock) admDock.classList.toggle('admin-only', !isAdmin);
+        // скрыть/показать элементы редактирования на карточках (пост-обработка)
+        tagAdminElements();
+      }
+
+      // Помечаем элементы карточек как admin-only
+      function tagAdminElements(){
+        try{
+          document.querySelectorAll('[data-edit], [data-editor], [data-remove-idx], [data-clear]').forEach(el=>{
+            el.classList.add('admin-only');
+          });
+          // Подсказку о редактировании показываем только админу
+          const hint = document.getElementById('productsHint');
+          if(hint){ hint.classList.toggle('admin-only', !isAdmin); }
+        }catch(_){}
+      }
+
+      // Оборачиваем window.renderProducts, чтобы после любого рендера пометить элементы
+      const _origRender = window.renderProducts;
+      if(typeof _origRender === 'function'){
+        window.renderProducts = function(){
+          const r = _origRender.apply(this, arguments);
+          setTimeout(tagAdminElements, 0);
+          return r;
+        };
+      } else {
+        // если не успели — подстрахуемся позже
+        document.addEventListener('DOMContentLoaded', ()=> setTimeout(tagAdminElements, 300));
+      }
+
+      // Первичное применение
+      document.addEventListener('DOMContentLoaded', ()=>{
+        applyAdminUI();
+        setTimeout(tagAdminElements, 300);
+      });
+
+      // Горячая клавиша Option+Command+A
+      document.addEventListener('keydown', (e)=>{
+        if (e.metaKey && e.altKey && (e.key === 'a' || e.key === 'A')){ e.preventDefault(); e.preventDefault();
+          if(isAdmin){
+            // уже вошли — показать/скрыть док? сделаем лог-аут по повторному нажатию
+            // но лучше открывать панель входа только если не залогинен
+            const wantLogout = confirm('Вы уже вошли как администратор. Выйти?');
+            if(wantLogout){ logoutAdmin(); }
+          } else {
+            showLogin();
+          }
+        }
+      });
+
+      // Кнопки и форма логина
+      document.querySelectorAll('[data-close-login]').forEach(el=> el.addEventListener('click', hideLogin));
+      document.getElementById('admCancel').addEventListener('click', hideLogin);
+      document.getElementById('admForm').addEventListener('submit', (e)=>{
+        e.preventDefault();
+        const v = (document.getElementById('admPass').value || '').trim();
+        if(!v) return;
+        if(v === ADMIN_PASSWORD){
+          isAdmin = true;
+          localStorage.setItem(LS_ADMIN, '1');
+          applyAdminUI();
+          hideLogin();
+          alert('Вход выполнен');
+        } else {
+          alert('Неверный пароль');
+        }
+      });
+
+      // Выход
+      function logoutAdmin(){
+        isAdmin = false;
+        localStorage.removeItem(LS_ADMIN);
+        applyAdminUI();
+        alert('Вы вышли из режима администратора');
+      }
+      document.getElementById('admLogout').addEventListener('click', logoutAdmin);
+
+      // Экспорт JSON
+      document.getElementById('admExport').addEventListener('click', ()=>{
+        try{
+          const raw = localStorage.getItem(LS_KEY) || '[]';
+          const data = JSON.parse(raw);
+          const payload = { exported_at: new Date().toISOString(), products: data };
+          const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url; a.download = 'stickiton-products.json';
+          document.body.appendChild(a); a.click(); a.remove();
+          setTimeout(()=>URL.revokeObjectURL(url), 2000);
+        }catch(e){ alert('Не удалось экспортировать: ' + e); }
+      });
+
+      // Импорт JSON
+      const importInput = document.getElementById('admImportFile');
+      document.getElementById('admImport').addEventListener('click', ()=> importInput.click());
+      importInput.addEventListener('change', async ()=>{
+        const file = importInput.files && importInput.files[0];
+        importInput.value = '';
+        if(!file) return;
+        try{
+          const text = await file.text();
+          const parsed = JSON.parse(text);
+          const list = Array.isArray(parsed) ? parsed : (parsed.products || []);
+          if(!Array.isArray(list)) throw new Error('Некорректный формат');
+          // ограничиваем до 5 фото на товар
+          const trimmed = list.map(p => {
+            const imgs = Array.isArray(p.imgs) ? p.imgs.slice(0,5) : (p.img ? [p.img] : []);
+            return {...p, imgs, img: imgs[0] || ''};
+          });
+          localStorage.setItem(LS_KEY, JSON.stringify(trimmed));
+          if(typeof window.renderProducts === 'function') window.renderProducts();
+          alert('Импортировано товаров: ' + trimmed.length);
+        }catch(e){ alert('Ошибка импорта: ' + e); }
+      });
+
+      // Перехват сохранения карточек, чтобы ограничить до 5 фото
+      document.addEventListener('click', (e)=>{
+        const btn = e.target.closest('[data-save]');
+        if(!btn) return;
+        // через небольшой таймаут, когда основной код уже сохранил
+        setTimeout(()=>{
+          try{
+            const raw = localStorage.getItem(LS_KEY) || '[]';
+            const data = JSON.parse(raw);
+            const fixed = data.map(p=>{
+              const imgs = Array.isArray(p.imgs) ? p.imgs.slice(0,5) : (p.img ? [p.img] : []);
+              return {...p, imgs, img: imgs[0] || ''};
+            });
+            localStorage.setItem(LS_KEY, JSON.stringify(fixed));
+            if(typeof window.renderProducts === 'function') window.renderProducts();
+          }catch(_){}
+        }, 200);
+      }, true);
+
+      // Если пользователь нажимает "Настройки", а админ не вошёл — попросим войти
+      const openSettingsBtn = document.getElementById('openSettings');
+      if(openSettingsBtn){
+        openSettingsBtn.addEventListener('click', (e)=>{
+          if(!isAdmin){
+            e.stopImmediatePropagation();
+            e.preventDefault();
+            showLogin();
+          }
+        }, true);
+      }
+
+      // ---- Helper to toggle login/logout uniformly ----
+      function openAdminToggle(){
+        if(isAdmin){
+          const wantLogout = confirm('Вы уже вошли как администратор. Выйти?');
+          if(wantLogout){ logoutAdmin(); }
+        } else {
+          showLogin();
+        }
+      }
+
+      // ---- Extra hotkeys (more reliable on macOS) ----
+      document.addEventListener('keydown', function(e){
+        const k = (e.key || '').toLowerCase();
+        // Allow: Ctrl+Shift+A OR Option+Shift+A OR Command+Shift+A
+        if ((e.ctrlKey && e.shiftKey && k === 'a') ||
+            (e.altKey  && e.shiftKey && k === 'a') ||
+            (e.metaKey && e.shiftKey && k === 'a')){
+          e.preventDefault();
+          openAdminToggle();
+        }
+      });
+
+      // ---- Fallback: triple-press "A" within short time (no modifiers) ----
+      (function(){
+        let cnt = 0, ts = 0;
+        document.addEventListener('keydown', function(e){
+          if(e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return;
+          const k = (e.key || '').toLowerCase();
+          if(k !== 'a') return;
+          const now = Date.now();
+          cnt = (now - ts < 500) ? (cnt + 1) : 1;
+          ts = now;
+          if(cnt >= 3){
+            e.preventDefault();
+            showLogin();
+            cnt = 0;
+          }
+        });
+      })();
+
+      // ---- Secret corner: 5 clicks bottom-right ----
+      (function(){
+        const z = document.createElement('div');
+        z.setAttribute('aria-hidden','true');
+        z.style.cssText = 'position:fixed;right:0;bottom:0;width:44px;height:44px;opacity:0;z-index:2147483000;cursor:pointer;';
+        document.addEventListener('DOMContentLoaded', () => document.body.appendChild(z));
+        let clicks = 0, last = 0;
+        z.addEventListener('click', function(){
+          const now = Date.now();
+          clicks = (now - last < 600) ? (clicks + 1) : 1;
+          last = now;
+          if(clicks >= 5){
+            openAdminToggle();
+            clicks = 0;
+          }
+        });
+      })();
+
+      // ---- Auto-open by hash or query param ----
+      document.addEventListener('DOMContentLoaded', function(){
+        try{
+          const params = new URLSearchParams(location.search);
+          if(location.hash === '#admin' || params.get('admin') === '1'){
+            showLogin();
+          }
+        }catch(_){}
+      });
+
+    })();
+  </script>
+
+</body>
+</html>
