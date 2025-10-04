@@ -1,181 +1,111 @@
-(function () {
-  // ===== Настройки =====
-  const LS_KEY = "sio_products_v1";         // ключ каталога
-  const API_URL = "/api/products";          // endpoint на Vercel
-  const MAX_IMGS = 5;                       // максимум изображений на товар
+(function(){
+  const LS_KEY = "sio_products_v1";
+  const API_URL = "/api/products";
+  const MAX_IMGS = 5;
 
-  // ===== i18n (минимально) =====
-  const t = (() => {
-    // определим язык по активной кнопке/атрибуту, иначе RU
-    const activeLang =
-      (document.querySelector('[data-lang].active')?.getAttribute('data-lang')) ||
-      (document.documentElement.getAttribute('lang')) ||
-      'ru';
-    const lang = String(activeLang).toLowerCase();
-
-    const dict = {
-      ru: {
-        loadBtn: "Загрузить из облака",
-        saveBtn: "Сохранить в облако",
-        loadOk: n => `Загружено товаров: ${n}`,
-        saveOk: n => `Сохранено в облако: ${n}`,
-        secretAsk: "Введите секрет для синхронизации",
-        errLoad: msg => `Ошибка загрузки: ${msg}`,
-        errSave: msg => `Ошибка сохранения: ${msg}`,
-        unauthorized: "Неверный секрет (401)",
-      },
-      uk: {
-        loadBtn: "Завантажити з хмари",
-        saveBtn: "Зберегти в хмару",
-        loadOk: n => `Завантажено товарів: ${n}`,
-        saveOk: n => `Збережено в хмару: ${n}`,
-        secretAsk: "Введіть секрет для синхронізації",
-        errLoad: msg => `Помилка завантаження: ${msg}`,
-        errSave: msg => `Помилка збереження: ${msg}`,
-        unauthorized: "Невірний секрет (401)",
-      },
-      en: {
-        loadBtn: "Load from Cloud",
-        saveBtn: "Save to Cloud",
-        loadOk: n => `Loaded products: ${n}`,
-        saveOk: n => `Saved to cloud: ${n}`,
-        secretAsk: "Enter sync secret",
-        errLoad: msg => `Load error: ${msg}`,
-        errSave: msg => `Save error: ${msg}`,
-        unauthorized: "Wrong secret (401)",
-      }
-    };
-    if (lang.startsWith('uk')) return dict.uk;
-    if (lang.startsWith('en')) return dict.en;
-    return dict.ru;
-  })();
-
-  // ===== Утилиты =====
-  const isValidUrl = u =>
-    !!u && typeof u === "string" &&
-    /^(https?:)?\/\//i.test(u); // http(s) или protocol-relative
-
+  // ==== утилиты ====
+  const isValidUrl = u => !!u && typeof u === "string" && /^(https?:)?\/\//i.test(u);
   const uniq = arr => Array.from(new Set(arr || []));
+  const sanitize = list => (Array.isArray(list)?list:[]).map(p=>{
+    const raw = Array.isArray(p.imgs)?p.imgs:(p.img?[p.img]:[]);
+    const imgs = uniq(raw.filter(isValidUrl)).slice(0,MAX_IMGS);
+    return {...p,imgs,img:imgs[0]||""};
+  });
 
-  function sanitizeProducts(list) {
-    const src = Array.isArray(list) ? list : [];
-    return src.map(p => {
-      const raw = Array.isArray(p.imgs) ? p.imgs : (p.img ? [p.img] : []);
-      // убираем пустые/битые, дедупим, режем до MAX_IMGS
-      const imgs = uniq(raw.filter(isValidUrl)).slice(0, MAX_IMGS);
-      return { ...p, imgs, img: imgs[0] || "" };
-    });
-  }
+  const getLocal = ()=>{ try{return JSON.parse(localStorage.getItem(LS_KEY)||"[]");}catch{return[];}};
+  const setLocal = list=>{
+    const clean = sanitize(list);
+    localStorage.setItem(LS_KEY,JSON.stringify(clean));
+    if(typeof window.renderProducts==="function")try{window.renderProducts();}catch{}
+  };
 
-  function getLocal() {
-    try {
-      return JSON.parse(localStorage.getItem(LS_KEY) || "[]");
-    } catch {
-      return [];
-    }
-  }
-
-  function setLocal(list) {
-    const clean = sanitizeProducts(list);
-    localStorage.setItem(LS_KEY, JSON.stringify(clean));
-    // если есть функция отрисовки — дернём её
-    if (typeof window.renderProducts === "function") {
-      try { window.renderProducts(); } catch { /* no-op */ }
-    }
-  }
-
-  async function apiGet() {
-    const r = await fetch(API_URL, { cache: "no-store" });
-    if (!r.ok) throw new Error("GET " + r.status);
+  async function apiGet(){
+    const r = await fetch(API_URL,{cache:"no-store"});
     const j = await r.json();
-    return sanitizeProducts(j?.products || []);
+    return sanitize(j.products||[]);
   }
 
-  async function apiPost(list, secret) {
-    const r = await fetch(API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-admin-secret": secret || ""
+  async function apiPost(list,secret){
+    const r = await fetch(API_URL,{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "x-admin-secret":secret||""
       },
-      body: JSON.stringify({ products: sanitizeProducts(list || []) })
+      body:JSON.stringify({products:sanitize(list||[])})
     });
-    if (!r.ok) {
-      // 401 — неверный секрет, 403 — write запрещён, остальное — общая ошибка
-      let body = "";
-      try { body = await r.text(); } catch { /* no-op */ }
-      const msg = r.status === 401 ? t.unauthorized : `POST ${r.status} ${body || ""}`;
-      throw new Error(msg);
+    if(!r.ok){
+      let txt="";try{txt=await r.text();}catch{}
+      throw new Error(`POST ${r.status} ${txt}`);
     }
     return r.json();
   }
 
-  function toast(msg) {
-    // Простая «алертовая» прослойка: если есть свой модал — используй его
-    alert(msg);
-  }
-
-  // ===== Кнопки в админ-доке =====
-  function addButtons() {
-    const dock = document.getElementById("adminDock");
-    if (!dock) return; // нет админ-дока — не добавляем
-
-    // Чтобы не дублировать при повторном init
-    if (dock.querySelector('[data-cloud="load"]')) return;
-
-    const btnLoad = document.createElement("button");
-    btnLoad.className = "btn";
-    btnLoad.dataset.cloud = "load";
-    btnLoad.textContent = t.loadBtn;
-
-    const btnSave = document.createElement("button");
-    btnSave.className = "btn";
-    btnSave.dataset.cloud = "save";
-    btnSave.textContent = t.saveBtn;
-
-    btnLoad.addEventListener("click", async () => {
-      try {
-        const list = await apiGet();
-        setLocal(list);
-        toast(t.loadOk(list.length));
-      } catch (e) {
-        toast(t.errLoad(e.message || e));
-      }
-    });
-
-    btnSave.addEventListener("click", async () => {
-      try {
-        const secret = prompt(t.secretAsk);
-        if (!secret) return;
-        const local = getLocal();
-        const res = await apiPost(local, secret);
-        // после успешного сохранения — сразу подтянем из облака (истина)
-        const fresh = await apiGet();
-        setLocal(fresh);
-        toast(t.saveOk(res?.count ?? fresh.length ?? 0));
-      } catch (e) {
-        toast(t.errSave(e.message || e));
-      }
-    });
-
-    dock.appendChild(btnLoad);
-    dock.appendChild(btnSave);
-  }
-
-  // ===== Автозагрузка при «пустом» каталоге =====
-  document.addEventListener("DOMContentLoaded", async () => {
-    try {
-      const local = getLocal();
-      if (!local || !local.length) {
-        const cloud = await apiGet();
-        if (cloud && cloud.length) setLocal(cloud);
-      } else {
-        // даже если локально что-то есть — почистим (уберёт пустые/дубли)
+  // ==== авто-загрузка при первом входе ====
+  document.addEventListener("DOMContentLoaded",async()=>{
+    try{
+      const local=getLocal();
+      if(!local.length){
+        const cloud=await apiGet();
+        if(cloud.length)setLocal(cloud);
+      }else{
         setLocal(local);
       }
-    } catch { /* молча */ }
-
-    addButtons();
+    }catch{}
   });
 
+  // ==== интеграция в админ-панель ====
+  document.addEventListener("DOMContentLoaded",()=>{
+    const dock=document.getElementById("adminDock");
+    if(!dock)return;
+
+    // --- кнопка загрузки из облака ---
+    const btnLoad=document.createElement("button");
+    btnLoad.textContent="Загрузить из облака";
+    btnLoad.onclick=async()=>{
+      try{
+        const list=await apiGet();
+        setLocal(list);
+        alert(`Загружено товаров: ${list.length}`);
+      }catch(e){alert(`Ошибка загрузки: ${e.message}`);}
+    };
+    dock.appendChild(btnLoad);
+
+    // --- кнопка ручного сохранения ---
+    const btnSave=document.createElement("button");
+    btnSave.textContent="Сохранить в облако";
+    btnSave.onclick=async()=>{
+      const secret=prompt("Введите секрет для синхронизации");
+      if(!secret)return;
+      try{
+        const local=getLocal();
+        const res=await apiPost(local,secret);
+        alert(`Сохранено: ${res?.count??local.length}`);
+      }catch(e){alert(`Ошибка: ${e.message}`);}
+    };
+    dock.appendChild(btnSave);
+  });
+
+  // ==== авто-синхронизация при локальном сохранении ====
+  // перехватываем обновление localStorage (обычно через setItem)
+  const origSetItem = localStorage.setItem;
+  localStorage.setItem = function(k,v){
+    origSetItem.apply(this,arguments);
+    if(k===LS_KEY){
+      try{
+        const secret = sessionStorage.getItem("sio_sync_secret");
+        if(!secret)return; // пользователь ещё не вводил
+        const data = JSON.parse(v||"[]");
+        apiPost(data,secret).catch(()=>{});
+      }catch{}
+    }
+  };
+
+  // при первом вводе секрета сохраняем его в sessionStorage
+  window.addEventListener("keydown",e=>{
+    if(e.key==="F9"){ // F9 — быстрая установка секрета
+      const s=prompt("Введите секрет для авто-синхронизации");
+      if(s)sessionStorage.setItem("sio_sync_secret",s);
+    }
+  });
 })();
