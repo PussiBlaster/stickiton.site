@@ -4,18 +4,13 @@
   "description": "Stick It On Shop — static site with Vercel KV sync",
   "private": true,
   "type": "module",
-  "engines": {
-    "node": ">=18"
-  },
+  "engines": { "node": ">=18" },
   "scripts": {
+    "dev": "vercel dev",
+    "build": "echo 'no build step for static site'",
     "start": "vercel dev"
   },
-  "keywords": [
-    "vercel",
-    "static-site",
-    "esm",
-    "stickiton"
-  ],
+  "keywords": ["vercel","static-site","esm","stickiton"],
   "author": "Stick It On Shop",
   "license": "MIT"
 }
