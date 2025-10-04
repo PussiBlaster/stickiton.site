@@ -1,0 +1,21 @@
+{
+  "name": "stickiton-site",
+  "version": "1.0.0",
+  "description": "Stick It On Shop — static site with Vercel KV sync",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "vercel dev"
+  },
+  "keywords": [
+    "vercel",
+    "static-site",
+    "esm",
+    "stickiton"
+  ],
+  "author": "Stick It On Shop",
+  "license": "MIT"
+}
