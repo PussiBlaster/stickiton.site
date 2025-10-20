@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<title>Stick It On Shop</title>
+<link rel="icon" href="logo-icon.png" type="image/png"/>
+<style>
+:root{--bg:#ffffff;--panel:#ffffff;--card:#ffffff;--line:#e5e7eb;--text:#0f172a;--muted:#64748b;--accent:#111;--icon:#0f172a;--radius:20px;--shadow:0 8px 30px rgba(0,0,0,.08)}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Inter,Roboto,Arial,sans-serif}
+a{color:inherit;text-decoration:none}
+button{font:inherit;cursor:pointer}
+.small{font-size:12px;color:var(--muted)}
+/* Header */
+header{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.85);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.bar{max-width:1100px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:10px}
+.brandmini{width:46px;height:46px;border-radius:50%;overflow:hidden;border:1px solid var(--line);display:grid;place-items:center;background:#fff;flex:0 0 auto}
+.brandmini img{width:100%;height:100%;object-fit:cover}
+nav{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.tab{padding:10px 14px;border:1px solid var(--line);border-radius:12px;background:#fff;color:#111;font-weight:700}
+.tab[aria-current="page"]{background:#fff;box-shadow:var(--shadow)}
+#cartOpen{background:#111;color:#fff;border-color:#111}
+.select{padding:9px 12px;border-radius:12px;border:1px solid var(--line);background:#fff;color:#111}
+/* Layout */
+.container{max-width:1100px;margin:0 auto;padding:24px 16px}
+main section[id]{display:none}
+.home{min-height:calc(100dvh - 70px);display:grid;place-items:center;text-align:center}
+.logo-wrap{display:grid;place-items:center;margin:6px auto}
+.logo{width:min(92vw,760px);height:auto;display:block;filter:drop-shadow(0 10px 30px rgba(0,0,0,.08))}
+.slogan{margin-top:14px;font-size:clamp(16px,2.6vw,22px);color:#64748b}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+@media (max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:560px){.grid{grid-template-columns:1fr}}
+.card{position:relative;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;display:flex;flex-direction:column;gap:12px}
+.badge{position:absolute;top:10px;left:10px;background:#111;color:#fff;border-radius:999px;padding:2px 8px;font-size:12px;font-weight:700}
+.thumb{width:100%;aspect-ratio:4/3;border-radius:14px;overflow:hidden;background:#f7f7f7;border:1px dashed #d1d5db;display:grid;place-items:center;font-size:12px;color:#666}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.mini{width:60px;height:46px;border-radius:8px;border:1px solid var(--line);overflow:hidden;background:#f7f7f7;display:grid;place-items:center;position:relative}
+.mini img{width:100%;height:100%;object-fit:cover}
+.mini .x{position:absolute;top:2px;right:2px;border:none;background:rgba(0,0,0,.6);color:#fff;border-radius:6px;height:20px;width:20px;line-height:20px;display:none}
+body.is-admin .mini:hover .x{display:block}
+.title{font-size:18px;font-weight:800}
+.price{font-size:16px;color:#475569}
+.row{display:flex;gap:8px;align-items:center}
+.grow{flex:1}
+.btn{padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:#111;color:#fff;font-weight:800}
+.btn.ghost{background:#fff;color:#111}
+/* Product details */
+#productPage .wrap{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+@media (max-width:900px){#productPage .wrap{grid-template-columns:1fr;gap:16px}}
+.pd-hero{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:12px;display:grid;gap:10px}
+.pd-hero .main{width:100%;aspect-ratio:4/3;border-radius:12px;overflow:hidden;background:#f7f7f7;display:grid;place-items:center}
+.pd-hero .main img{width:100%;height:100%;object-fit:cover}
+.pd-hero .thumbs .mini{width:76px;height:56px}
+.pd-info{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:16px;display:grid;gap:12px}
+/* Contact */
+.contact-wrap{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+@media (max-width:900px){.contact-wrap{grid-template-columns:1fr}}
+.contact-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px}
+.contact-form{display:grid;grid-template-columns:1fr;gap:12px;max-width:560px;margin:0 auto;width:100%}
+.contact-form input,.contact-form textarea{display:block;width:100%;border-radius:12px;padding:12px 14px;border:1px solid var(--line);background:#fff;color:#111;font-size:16px;line-height:1.4}
+.contact-form textarea{min-height:140px}
+.iconlink{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:#fff;max-width:560px;margin:0 auto;color:var(--icon)}
+.iconlink svg,.footer-link svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+/* Footer */
+footer{margin-top:24px;border-top:1px solid var(--line);background:#fff}
+.footer-inner{max-width:1100px;margin:0 auto;padding:14px 16px;display:flex;justify-content:center;gap:16px;flex-wrap:wrap;align-items:center}
+.footer-link{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:12px;padding:6px 10px;background:#fff;color:var(--icon)}
+.footer-link span,.iconlink span{color:var(--text)}
+/* Cart / Admin / Modal */
+.cart{position:fixed;inset:0;z-index:60;display:none}
+.cart.open{display:block}
+.cart-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.25)}
+.cart-drawer{position:absolute;right:0;top:0;height:100%;width:min(440px,100%);background:#fff;border-left:1px solid var(--line);display:flex;flex-direction:column;box-shadow:-6px 0 20px rgba(0,0,0,.06)}
+.cart-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--line)}
+.cart-items{padding:10px 12px;overflow:auto;flex:1;display:grid;gap:10px}
+.cart-item{display:grid;grid-template-columns:72px 1fr auto;gap:10px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:8px;background:#fff}
+.ci-thumb{width:72px;height:54px;border-radius:8px;overflow:hidden;background:#f7f7f7;border:1px dashed #d1d5db;display:grid;place-items:center;color:#999;font-size:12px}
+.ci-thumb img{width:100%;height:100%;object-fit:cover}
+.ci-title{font-weight:800}
+.ci-price{color:#6b7280;font-size:14px}
+.ci-qty{display:flex;align-items:center;gap:8px;margin-top:6px}
+.qtybtn{width:30px;height:30px;border-radius:8px;border:1px solid var(--line);background:#f3f4f6;color:#111}
+.cart-foot{border-top:1px solid var(--line);padding:12px 14px;display:grid;gap:8px;background:#fff}
+.admin-only{display:none !important}
+body.is-admin .admin-only{display:initial !important}
+.modal{position:fixed;inset:0;display:none;place-items:center;z-index:70}
+.modal.open{display:grid}
+.modal .backdrop{position:absolute;inset:0;background:rgba(0,0,0,.35)}
+.modal .box{position:relative;width:min(860px,95vw);max-height:90vh;overflow:auto;background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:16px;display:grid;gap:10px}
+.modal input, .modal textarea{padding:10px;border:1px solid var(--line);border-radius:10px;width:100%;background:#fff;color:#111}
+fieldset{border:1px dashed var(--line);border-radius:12px;padding:10px}
+.drop{border:2px dashed #cbd5e1;border-radius:12px;padding:12px;text-align:center;background:#f8fafc;color:#475569}
+.drop.drag{background:#eef2ff;border-color:#818cf8}
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <a class="brandmini" id="secretLogo" href="#home" title="Stick It On">
+      <img id="logoSmall" alt="logo" src="logo-icon.png"/>
+    </a>
+    <nav>
+      <a class="tab" id="tabHome" href="#home" aria-current="page" data-i18n="nav.home">Главная</a>
+      <a class="tab" id="tabProducts" href="#products" data-i18n="nav.products">Товары</a>
+      <a class="tab" id="tabContact" href="#contact" data-i18n="nav.contacts">Контакты</a>
+      <button type="button" class="tab" id="cartOpen"><span data-i18n="nav.cart">Корзина</span>: <b id="cartCount">0</b></button>
+      <select id="langSel" class="select" title="Language">
+        <option value="ru">RU</option>
+        <option value="uk">UK</option>
+        <option value="en">EN</option>
+      </select>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="container home" id="home">
+    <div>
+      <div class="logo-wrap"><img id="logoBig" class="logo" alt="Stick It On" src="logo-big.png"/></div>
+      <p class="slogan" data-i18n="slogan">Hide the warning. Show your style</p>
+    </div>
+  </section>
+
+  <section class="container" id="products">
+    <div class="row" style="margin:4px 0 16px">
+      <h2 class="grow" data-i18n="products.title">Товары</h2>
+      <button id="addBtn" class="btn admin-only" type="button" data-i18n="products.add">Добавить товар</button>
+    </div>
+    <div id="grid" class="grid"></div>
+    <p class="small admin-only" data-i18n="products.hint">Редактирование включено. Можно менять название, цену (грн), фото (загрузка файлов +/или URL). Можно удалять товары.</p>
+  </section>
+
+  <section class="container" id="productPage">
+    <div class="wrap">
+      <div class="pd-hero">
+        <div class="main" id="pdMain">Фото</div>
+        <div id="pdThumbs" class="thumbs"></div>
+      </div>
+      <div class="pd-info">
+        <div class="row"><h2 id="pdTitle" class="grow">Название</h2><span id="pdPrice" class="price">0 грн</span></div>
+        <div id="pdDesc" style="white-space:pre-wrap;color:#111"></div>
+        <div class="row">
+          <button class="btn" id="pdBuy" onclick="" data-i18n="buy">Купить</button>
+          <span class="grow"></span>
+          <div class="admin-only" style="display:flex;gap:8px">
+            <button class="btn" id="pdEdit" data-i18n="edit">Изменить</button>
+            <button class="btn ghost" id="pdDelete" data-i18n="delete">Удалить</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:16px"><a class="btn ghost" href="#products" data-i18n="back">← Назад к товарам</a></div>
+  </section>
+
+  <section class="container" id="contact">
+    <h2 style="margin:4px 0 16px" data-i18n="contacts.title">Контакты</h2>
+    <div class="contact-wrap">
+      <div class="contact-card">
+        <form id="contactForm" class="contact-form">
+          <input name="name" placeholder="Ім'я" required/>
+          <input name="email" type="email" placeholder="Email" required/>
+          <textarea name="message" placeholder="Повідомлення" required></textarea>
+          <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off">
+          <input type="hidden" name="_subject" value="New message from Stick It On">
+          <button class="btn" type="submit" data-i18n="contact.send">Надіслати</button>
+        </form>
+        <div id="contactStatus" class="small"></div>
+      </div>
+      <div class="contact-card" style="display:grid;gap:12px">
+        <a class="iconlink" href="mailto:sales@stickiton.shop">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 6h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2Z"/>
+            <path d="M22 8 12 13 2 8"/>
+          </svg>
+          <span>sales@stickiton.shop</span>
+        </a>
+        <a class="iconlink" target="_blank" rel="noopener" href="https://instagram.com/stickiton.shop">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="3" y="3" width="18" height="18" rx="5" ry="5"/>
+            <circle cx="12" cy="12" r="4.2"/>
+            <circle cx="17.5" cy="6.5" r="1.2"/>
+          </svg>
+          <span>@stickiton.shop</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- CART -->
+<div id="cart" class="cart" aria-hidden="true">
+  <div class="cart-backdrop" onclick="toggleCart(false)"></div>
+  <aside class="cart-drawer" role="dialog" aria-label="Cart">
+    <div class="cart-head">
+      <strong data-i18n="nav.cart">Корзина</strong>
+      <button class="btn ghost" onclick="toggleCart(false)">✕</button>
+    </div>
+    <div id="cartItems" class="cart-items"></div>
+    <div class="cart-foot">
+      <div class="row"><span class="grow" data-i18n="sum">Итого</span><b id="cartTotal">0 грн</b></div>
+      <div class="small" id="minNote"></div>
+      <button id="checkoutBtn" class="btn" onclick="checkout()" data-i18n="checkout">Оформить</button>
+    </div>
+  </aside>
+</div>
+
+<!-- ADMIN DOCK -->
+<div id="adminDock" class="admin-only" style="position:fixed;right:14px;bottom:14px;z-index:80;display:flex;gap:8px">
+  <button class="btn" onclick="openSettings()" data-i18n="settings">Настройки</button>
+  <button class="btn" onclick="saveToGitHub()">💾 Сохранить в GitHub</button>
+  <button class="btn" onclick="resetData()" data-i18n="reset">Сброс</button>
+  <button class="btn ghost" onclick="logoutAdmin()" data-i18n="logout">Выйти</button>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div id="settingsModal" class="modal" aria-hidden="true">
+  <div class="backdrop" onclick="closeSettings()"></div>
+  <div class="box" role="dialog" aria-label="Настройки">
+    <h3 data-i18n="settings">Настройки</h3>
+    <label><b>Logo (круг) URL</b> <input id="setLogoSmall" placeholder="logo-icon.png" /></label>
+    <label><b>Logo (большое) URL</b> <input id="setLogoBig" placeholder="logo-big.png" /></label>
+    <label><b data-i18n="language">Язык интерфейса</b>
+      <select id="setLang">
+        <option value="ru">Русский</option>
+        <option value="uk">Українська</option>
+        <option value="en">English</option>
+      </select>
+    </label>
+    <fieldset>
+      <legend>Contact form</legend>
+      <label><b>Provider</b>
+        <select id="setFormProvider">
+          <option value="disabled">Disabled</option>
+          <option value="formspree" selected>Formspree (endpoint URL)</option>
+        </select>
+      </label>
+      <label><b>Endpoint / Access key</b> <input id="setFormKey" placeholder="https://formspree.io/f/XXXXYYYY or web3forms access_key"/></label>
+      <p class="small">Formspree: вставь полный URL эндпоинта. Web3Forms: вставь свой <code>access_key</code>.</p>
+    </fieldset>
+    <div class="row">
+      <button class="btn" onclick="saveSettings()" data-i18n="save">Сохранить</button>
+      <span class="grow"></span>
+      <button class="btn ghost" onclick="closeSettings()" data-i18n="close">Закрыть</button>
+    </div>
+  </div>
+</div>
+
+<!-- PRODUCT MODAL -->
+<div id="productModal" class="modal" aria-hidden="true">
+  <div class="backdrop" onclick="closeProduct()"></div>
+  <div class="box" role="dialog" aria-label="Товар">
+    <h3 data-i18n="product">Товар</h3>
+    <label><b data-i18n="name">Название</b><input id="pName"/></label>
+    <label><b data-i18n="price">Цена (грн)</b><input id="pPrice" type="number" step="0.01"/></label>
+    <label><b data-i18n="desc">Описание</b><textarea id="pDesc" rows="4" placeholder="Короткое описание товара"></textarea></label>
+    <fieldset>
+      <legend data-i18n="photos">Фото товара</legend>
+      <div class="drop" id="dropZone" data-i18n="drop">Перетащи сюда фото или нажми, чтобы выбрать</div>
+      <input id="pFiles" type="file" accept="image/*" multiple style="display:none"/>
+      <label><b data-i18n="photo_urls">Фото по URL</b><textarea id="pPhotos" rows="2" placeholder="https://..."></textarea></label>
+      <div id="pPreview" class="thumbs"></div>
+      <p class="small" data-i18n="photo_hint">Фото оптимизируются автоматически (миниатюры + полноразмер). Ненужные снимки можно удалить крестиком.</p>
+    </fieldset>
+    <div class="row">
+      <button class="btn" onclick="saveProduct()" data-i18n="save">Сохранить</button>
+      <span class="grow"></span>
+      <button id="deleteBtn" class="btn ghost admin-only" onclick="deleteProduct()" data-i18n="delete">Удалить</button>
+      <button class="btn ghost" onclick="closeProduct()" data-i18n="close">Закрыть</button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <a class="footer-link" href="mailto:sales@stickiton.shop">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M4 6h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2Z"/>
+        <path d="M22 8 12 13 2 8"/>
+      </svg>
+      <span>sales@stickiton.shop</span>
+    </a>
+    <a class="footer-link" target="_blank" rel="noopener" href="https://instagram.com/stickiton.shop">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="3" y="3" width="18" height="18" rx="5" ry="5"/>
+        <circle cx="12" cy="12" r="4.2"/>
+        <circle cx="17.5" cy="6.5" r="1.2"/>
+      </svg>
+      <span>@stickiton.shop</span>
+    </a>
+  </div>
+</footer>
+
+<script>
+/* ===== i18n ===== */
+const T={
+  ru:{ "nav.home":"Главная","nav.products":"Товары","nav.contacts":"Контакты","nav.cart":"Корзина","slogan":"Hide the warning. Show your style",
+       "products.title":"Товары","products.add":"Добавить товар","products.hint":"Редактирование включено. Можно менять название, цену (грн), фото (загрузка файлов +/или URL). Можно удалять товары.",
+       "buy":"Купить","edit":"Изменить","delete":"Удалить","back":"← Назад к товарам",
+       "contacts.title":"Контакты","contact.send":"Надіслати","contact.thanks":"Спасибо! Мы ответим в ближайшее время.","contact.sent_ok":"Сообщение отправлено. Спасибо!","contact.sent_err":"Ошибка отправки. Попробуйте позже.","contact.sent_net":"Ошибка сети. Повторите попытку.",
+       "sum":"Итого","checkout":"Оформить","settings":"Настройки","reset":"Сброс","logout":"Выйти","language":"Язык интерфейса","save":"Сохранить","close":"Закрыть",
+       "product":"Товар","name":"Название","price":"Цена (грн)","desc":"Описание","photos":"Фото товара","drop":"Перетащи сюда фото или нажми, чтобы выбрать","photo_urls":"Фото по URL","photo_hint":"Фото оптимизируются автоматически (миниатюры + полноразмер). Ненужные снимки можно удалить крестиком.",
+       "min_note":"Минимальная сумма заказа 100 грн (100.00 грн)","min_alert":"Минимальная сумма заказа 100 грн"
+     },
+  uk:{ "nav.home":"Головна","nav.products":"Товари","nav.contacts":"Контакти","nav.cart":"Кошик","slogan":"Hide the warning. Show your style",
+       "products.title":"Товари","products.add":"Додати товар","products.hint":"Редагування увімкнено. Можна змінювати назву, ціну (грн), фото (файли та/або URL). Можна видаляти товари.",
+       "buy":"Купити","edit":"Змінити","delete":"Видалити","back":"← Назад до товарів",
+       "contacts.title":"Контакти","contact.send":"Надіслати","contact.thanks":"Дякуємо! Ми відповімо найближчим часом.","contact.sent_ok":"Повідомлення надіслано. Дякуємо!","contact.sent_err":"Помилка відправки. Спробуйте пізніше.","contact.sent_net":"Помилка мережі. Повторіть спробу.",
+       "sum":"Разом","checkout":"Оформити","settings":"Налаштування","reset":"Скидання","logout":"Вийти","language":"Мова інтерфейсу","save":"Зберегти","close":"Закрити",
+       "product":"Товар","name":"Назва","price":"Ціна (грн)","desc":"Опис","photos":"Фото товару","drop":"Перетягни сюди фото або натисни, щоб обрати","photo_urls":"Фото за URL","photo_hint":"Фото оптимізуються автоматично (мініатюри + повний розмір). Непотрібні фото видаляються хрестиком.",
+       "min_note":"Мінімальна сума замовлення 100 грн (100.00 грн)","min_alert":"Мінімальна сума замовлення 100 грн"
+     },
+  en:{ "nav.home":"Home","nav.products":"Products","nav.contacts":"Contacts","nav.cart":"Cart","slogan":"Hide the warning. Show your style",
+       "products.title":"Products","products.add":"Add product","products.hint":"Admin on. You can change name, price (UAH), photos (files and/or URLs) and delete items.",
+       "buy":"Buy","edit":"Edit","delete":"Delete","back":"← Back to products",
+       "contacts.title":"Contacts","contact.send":"Send","contact.thanks":"Thanks! We'll reply soon.","contact.sent_ok":"Message sent. Thank you!","contact.sent_err":"Send error. Try later.","contact.sent_net":"Network error. Try again.",
+       "sum":"Total","checkout":"Checkout","settings":"Settings","reset":"Reset","logout":"Logout","language":"Interface language","save":"Save","close":"Close",
+       "product":"Product","name":"Name","price":"Price (UAH)","desc":"Description","photos":"Product photos","drop":"Drop photos here or click to choose","photo_urls":"Photos by URL","photo_hint":"Photos are optimized automatically (thumbnails + full). Remove unwanted with the cross.",
+       "min_note":"Minimum order amount is 100 UAH (100.00 UAH)","min_alert":"Minimum order amount is 100 UAH"
+     }
+};
+function tr(key){const lang=settings.lang||"ru"; return T[lang][key]||T.ru[key]||key;}
+function applyI18n(){const lang=settings.lang||"ru";document.documentElement.lang=lang;document.querySelectorAll("[data-i18n]").forEach(el=>{const k=el.getAttribute("data-i18n"); const s=tr(k); if(s) el.textContent=s;});}
+
+/* ===== Settings ===== */
+const settingsKey="stickiton_settings_contact_v1";
+let settings = JSON.parse(localStorage.getItem(settingsKey)||"{}");
+if(!settings.lang) settings.lang="ru";
+if(!settings.logoSmall) settings.logoSmall="logo-icon.png";
+if(!settings.logoBig) settings.logoBig="logo-big.png";
+if(!settings.formProvider) settings.formProvider="disabled";
+if(!settings.formKey) settings.formKey="";
+function saveSettingsStore(){ localStorage.setItem(settingsKey, JSON.stringify(settings)); }
+function openSettings(){document.getElementById("setLogoSmall").value=settings.logoSmall||"";document.getElementById("setLogoBig").value=settings.logoBig||"";document.getElementById("setLang").value=settings.lang||"ru";document.getElementById("setFormProvider").value=settings.formProvider||"disabled";document.getElementById("setFormKey").value=settings.formKey||"";document.getElementById("settingsModal").classList.add("open");}
+function closeSettings(){ document.getElementById("settingsModal").classList.remove("open"); }
+function saveSettings(){settings.logoSmall=document.getElementById("setLogoSmall").value.trim()||"logo-icon.png";settings.logoBig=document.getElementById("setLogoBig").value.trim()||"logo-big.png";settings.lang=document.getElementById("setLang").value||"ru";settings.formProvider=document.getElementById("setFormProvider").value||"disabled";settings.formKey=document.getElementById("setFormKey").value.trim();saveSettingsStore();document.getElementById("logoSmall").src=settings.logoSmall;document.getElementById("logoBig").src=settings.logoBig;document.getElementById("langSel").value=settings.lang;applyI18n();closeSettings();}
+function applySettingsOnLoad(){document.getElementById("logoSmall").src=settings.logoSmall;document.getElementById("logoBig").src=settings.logoBig;document.getElementById("langSel").value=settings.lang;applyI18n();}
+
+/* ===== Image utils & products/cart (unchanged) ===== */
+const fmt=n=>(Number(n)||0).toFixed(2)+" грн";
+const parsePhotos=v=>v.replace(/\n/g,",").split(",").map(s=>s.trim()).filter(Boolean);
+const getMainPhoto=p=> (p && Array.isArray(p.photos) && p.photos[0] && (p.photos[0].thumb||p.photos[0].full)) ? (p.photos[0].thumb||p.photos[0].full) : "";
+let SUPPORT_WEBP=true;(function(){try{const c=document.createElement('canvas'); SUPPORT_WEBP=!!c.toDataURL('image/webp').startsWith('data:image/webp')}catch{SUPPORT_WEBP=false}})();
+function imgToCanvas(img, maxW){ const s=Math.min(1, maxW/img.width); const w=Math.max(1,Math.round(img.width*s)); const h=Math.max(1,Math.round(img.height*s)); const c=document.createElement('canvas'); c.width=w; c.height=h; c.getContext('2d').drawImage(img,0,0,w,h); return c; }
+function encodeCanvas(canvas, q=.85, small=false){ const type=SUPPORT_WEBP?'image/webp':'image/jpeg'; return canvas.toDataURL(type, small?Math.min(.8,q):q); }
+function loadImage(src){ return new Promise((res,rej)=>{ const img=new Image(); img.crossOrigin="anonymous"; img.onload=()=>res(img); img.onerror=rej; img.src=src; }); }
+async function makePair(src){ const img=await loadImage(src); return {full:encodeCanvas(imgToCanvas(img,1600),.85,false), thumb:encodeCanvas(imgToCanvas(img,400),.8,true)}; }
+const storeKey="stickiton_products_contact_v1";
+let products=JSON.parse(localStorage.getItem(storeKey)||"[]");
+if(products.length===0){products=[{id:1,name:"Front 55×34 мм",price:150,desc:"Качественная наклейка для передней части.",photos:[]},{id:2,name:"Back 55×62 мм",price:180,desc:"Надёжная задняя наклейка.",photos:[]}];saveData();}
+function saveData(){localStorage.setItem(storeKey, JSON.stringify(products));}
+function renderProducts(){const grid=document.getElementById("grid"); grid.innerHTML=""; products.forEach((p,i)=>{const card=document.createElement("div"); card.className="card"; const mainSrc=getMainPhoto(p); card.innerHTML=`<span class="badge">${(p.photos||[]).length}</span><a class="thumb" href="#product-${p.id}">${mainSrc?`<img loading="lazy" decoding="async" src="${mainSrc}" alt="">`:"Фото"}</a><div class="thumbs" id="thumbs-${i}"></div><div class="row"><a class="grow title" href="#product-${p.id}">${p.name}</a><div class="admin-only" style="display:flex;gap:8px"><button class="btn" onclick="editProduct(${i})" data-i18n="edit">Изменить</button><button class="btn ghost" onclick="deleteProduct(${i})" data-i18n="delete">Удалить</button></div></div><div class="row"><div class="grow price">${fmt(p.price)}</div><button class="btn" onclick="addToCart(${i})" data-i18n="buy">Купить</button></div>`; grid.appendChild(card); const th=document.getElementById("thumbs-"+i); th.innerHTML=(p.photos||[]).slice(0,8).map((ph,j)=>`<div class="mini"><img loading="lazy" decoding="async" src="${ph.thumb||ph.full}" alt=""><button class="x admin-only" onclick="removePhoto(${i},${j})">×</button></div>`).join("");}); applyI18n();}
+function removePhoto(pi, pj){ if(!confirm(tr("delete")+"?")) return; products[pi].photos.splice(pj,1); saveData(); renderProducts(); }
+function openProductPage(id){const p=products.find(x=>x.id===id); if(!p){location.hash="#products";return;} const main=document.getElementById("pdMain"); const first=getMainPhoto(p); main.innerHTML=first?`<img loading="lazy" decoding="async" src="${(p.photos[0].full||p.photos[0].thumb)}" alt="">`:"Фото"; const thumbs=document.getElementById("pdThumbs"); thumbs.innerHTML=(p.photos||[]).map((ph,idx)=>`<div class="mini"><img loading="lazy" decoding="async" src="${ph.thumb||ph.full}" alt=""></div>`).join(""); thumbs.querySelectorAll(".mini").forEach((el,idx)=>el.addEventListener("click",()=>{main.innerHTML='<img loading="lazy" decoding="async" src="'+(p.photos[idx].full||p.photos[idx].thumb)+'" alt="">';})); document.getElementById("pdTitle").textContent=p.name; document.getElementById("pdPrice").textContent=fmt(p.price); document.getElementById("pdDesc").textContent=p.desc||""; document.getElementById("pdBuy").onclick=()=>{const i=products.indexOf(p); addToCart(i); toggleCart(true);}; document.getElementById("pdEdit").onclick=()=>{const i=products.indexOf(p); editProduct(i);}; document.getElementById("pdDelete").onclick=()=>{const i=products.indexOf(p); deleteProduct(i);}; applyI18n(); show("productPage");}
+const ADMIN_PASS="110620"; let adminOn=false; let clicks=0;
+document.addEventListener("keydown",e=>{ if((e.ctrlKey||e.metaKey)&&e.shiftKey&&e.key.toLowerCase()==="a") askPass(); });
+document.getElementById("secretLogo").addEventListener("click",()=>{clicks++; if(clicks>=5){clicks=0; askPass();} setTimeout(()=>{clicks=0},1500);});
+function askPass(){ if(adminOn) return; const ok=prompt("Пароль администратора:"); if(ok===ADMIN_PASS){ document.body.classList.add("is-admin"); adminOn=true; alert("Admin ON"); } else if(ok!==null){ alert("Wrong password"); } }
+function logoutAdmin(){ document.body.classList.remove("is-admin"); adminOn=false; }
+function resetData(){ if(confirm("Очистить все данные?")){ localStorage.removeItem(storeKey); localStorage.removeItem(settingsKey); location.reload(); } }
+let currentIdx=-1; let modalPhotos=[];
+function addProduct(){currentIdx=-1; openProductModal();}
+function editProduct(i){currentIdx=i; openProductModal(products[i]);}
+function deleteProduct(i=currentIdx){ if(i<0) return; if(confirm(tr("delete")+"?")){ products.splice(i,1); saveData(); closeProduct(); renderProducts(); if(location.hash.startsWith("#product-")) location.hash="#products"; } }
+function openProductModal(p={name:"",price:0,desc:"",photos:[]}){document.getElementById("pName").value=p.name||"";document.getElementById("pPrice").value=p.price||0;document.getElementById("pDesc").value=p.desc||"";document.getElementById("pPhotos").value="";modalPhotos = Array.isArray(p.photos)? p.photos.map(ph=> typeof ph==="string" ? {full:ph, thumb:ph} : ph ) : [];renderPreview();document.getElementById("productModal").classList.add("open");document.getElementById("deleteBtn").style.display=(currentIdx>=0)?"inline-block":"none";applyI18n();}
+function closeProduct(){ document.getElementById("productModal").classList.remove("open"); }
+function renderPreview(){ const prev=document.getElementById("pPreview"); prev.innerHTML = modalPhotos.map((ph,idx)=>`<div class="mini"><img src="${ph.thumb||ph.full}" alt=""><button class="x" onclick="removePreview(${idx})">×</button></div>`).join(""); }
+function removePreview(idx){ modalPhotos.splice(idx,1); renderPreview(); }
+async function filesToPairs(files){ const tasks = Array.from(files).filter(f=>f.type&&f.type.startsWith('image/')).map(f=>{ const src = URL.createObjectURL(f); return makePair(src).then(pair=>{ URL.revokeObjectURL(src); return pair; }).catch(()=>{ URL.revokeObjectURL(src); return null; }); }); const pairs = await Promise.all(tasks); return pairs.filter(Boolean);}
+async function handleFiles(files){ const pairs = await filesToPairs(files); modalPhotos = modalPhotos.concat(pairs); renderPreview(); }
+async function addUrlsToPhotos(urls){ const pairs=(await Promise.all(urls.map(u=>makePair(u).catch(()=>null)))).filter(Boolean); modalPhotos = modalPhotos.concat(pairs); renderPreview(); }
+async function saveProduct(){ const name=document.getElementById("pName").value.trim(); const price=parseFloat(document.getElementById("pPrice").value||"0"); const desc=document.getElementById("pDesc").value.trim(); const urls=parsePhotos(document.getElementById("pPhotos").value); if(urls.length) await addUrlsToPhotos(urls); if(!name){ alert(tr("name")); return; } const seen=new Set(); modalPhotos = modalPhotos.filter(p=>{const k=p.full; if(!k || seen.has(k)) return false; seen.add(k); return true;}); if(currentIdx>=0){ products[currentIdx] = {...products[currentIdx], name, price, desc, photos: modalPhotos.slice()}; } else{ products.push({id:Date.now(), name, price, desc, photos: modalPhotos.slice()}); } saveData(); closeProduct(); renderProducts(); }
+(function(){ const dz=document.getElementById("dropZone"); const fileInput=document.getElementById("pFiles"); dz.addEventListener("click", ()=>fileInput.click()); fileInput.addEventListener("change", e=>{ handleFiles(e.target.files); fileInput.value=""; }); ["dragenter","dragover"].forEach(ev=>dz.addEventListener(ev, e=>{ e.preventDefault(); e.stopPropagation(); dz.classList.add("drag"); })); ["dragleave","drop"].forEach(ev=>dz.addEventListener(ev, e=>{ e.preventDefault(); e.stopPropagation(); dz.classList.remove("drag"); })); dz.addEventListener("drop", e=>{ handleFiles(e.dataTransfer.files); }); document.addEventListener("paste", async (e)=>{ const modalOpen = document.getElementById("productModal").classList.contains("open"); if(!modalOpen) return; const items = e.clipboardData && e.clipboardData.items; if(!items) return; const files=[]; for(let i=0;i<items.length;i++){ const it=items[i]; if(it.type && it.type.startsWith("image/")){ const f=it.getAsFile(); if(f) files.push(f); } } if(files.length) handleFiles(files); }); })();
+let cart=JSON.parse(localStorage.getItem("stickiton_cart_contact_v1")||"[]");
+const cartCount=()=>cart.reduce((s,c)=>s+c.qty,0);
+const cartTotal=()=>cart.reduce((s,c)=>s+c.price*c.qty,0);
+function toggleCart(open){const c=document.getElementById("cart"); c.classList.toggle("open",open!==false); renderCart();}
+document.getElementById("cartOpen").addEventListener("click",()=>toggleCart(true));
+function addToCart(i){const p=products[i]; const ex=cart.find(x=>x.id===p.id); if(ex) ex.qty++; else cart.push({id:p.id,name:p.name,price:p.price,photo:getMainPhoto(p)||"",qty:1}); localStorage.setItem("stickiton_cart_contact_v1",JSON.stringify(cart)); document.getElementById("cartCount").textContent=cartCount();}
+function renderCart(){ const el=document.getElementById("cartItems"); el.innerHTML=""; let total=0; cart.forEach((c,idx)=>{ total+=c.price*c.qty; const item=document.createElement("div"); item.className="cart-item"; item.innerHTML=`<div class="ci-thumb">${c.photo?`<img loading="lazy" decoding="async" src="${c.photo}" alt="">`:"Фото"}</div><div><div class="ci-title">${c.name}</div><div class="ci-price">${fmt(c.price)}</div><div class="ci-qty"><button class="qtybtn" onclick="qty(${idx},-1)">−</button><span>${c.qty}</span><button class="qtybtn" onclick="qty(${idx},1)">+</button></div></div><div><button class="btn ghost" onclick="removeItem(${idx})">✕</button></div>`; el.appendChild(item); }); document.getElementById("cartTotal").textContent=fmt(total); const min=100; const note=document.getElementById("minNote"); const btn=document.getElementById("checkoutBtn"); if(total<min){ note.textContent=tr("min_note"); btn.disabled=true; btn.style.opacity=.6;} else { note.textContent=""; btn.disabled=false; btn.style.opacity=1; } applyI18n();}
+function qty(idx,d){cart[idx].qty+=d; if(cart[idx].qty<=0) cart.splice(idx,1); localStorage.setItem("stickiton_cart_contact_v1",JSON.stringify(cart)); renderCart(); document.getElementById("cartCount").textContent=cartCount();}
+function removeItem(idx){cart.splice(idx,1); localStorage.setItem("stickiton_cart_contact_v1",JSON.stringify(cart)); renderCart(); document.getElementById("cartCount").textContent=cartCount();}
+function checkout(){ if(cartTotal()<100){alert(tr("min_alert"));return;} alert("Дякуємо! Оформлення з'явиться пізніше (демо).");}
+
+/* ===== Contact form handler ===== */
+/* ===== GitHub sync ===== */
+async function saveToGitHub(){
+  try{
+    const res = await fetch('/api/products', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ products })
+    });
+    const j = await res.json();
+    if(j.ok){ alert('✅ products.json обновлён в GitHub'); }
+    else{ alert('Ошибка: ' + (j.error||'unknown')); }
+  }catch(err){
+    alert('Сеть недоступна или API не сконфигурировано');
+  }
+}
+async function loadFromGitHub(){
+  try{
+    const r = await fetch('/api/products');
+    if(!r.ok) return false;
+    const j = await r.json();
+    if(j && j.ok && Array.isArray(j.products)){
+      products = j.products;
+      saveData(); // синхронизируем локально для офлайн-режима
+      return true;
+    }
+  }catch(err){}
+  return false;
+}
+
+const formEl = document.getElementById("contactForm");
+const statusEl = document.getElementById("contactStatus");
+async function sendContact(fd){
+  const provider=(settings.formProvider||"disabled").toLowerCase();
+  const key=(settings.formKey||"").trim();
+  if(provider==="formspree" && key){
+    const res = await fetch(key, { method:"POST", body:fd, headers:{ "Accept":"application/json" } });
+    return res.ok;
+  }else if(provider==="web3forms" && key){
+    const data = Object.fromEntries(fd.entries());
+    data.access_key = key;
+    const res = await fetch("https://api.web3forms.com/submit", {
+      method:"POST",
+      headers:{ "Content-Type":"application/json", "Accept":"application/json" },
+      body: JSON.stringify(data)
+    });
+    return res.ok;
+  }else{
+    throw new Error("Contact form disabled or not configured");
+  }
+}
+if(formEl){
+  formEl.addEventListener("submit", async (e)=>{
+    e.preventDefault();
+    statusEl.textContent="";
+    const fd = new FormData(formEl);
+    try{
+      const ok = await sendContact(fd);
+      if(ok){ statusEl.textContent = tr("contact.sent_ok"); formEl.reset(); }
+      else{ statusEl.textContent = tr("contact.sent_err"); }
+    }catch(err){
+      statusEl.textContent = tr("contact.sent_net");
+    }
+  });
+}
+
+/* ===== Router & Init ===== */
+const sections=["home","products","productPage","contact"];
+function show(id){sections.forEach(s=>{document.getElementById(s).style.display=s===id?"block":"none";}); if(id==="products"){renderProducts();}}
+function parseRoute(){const h=(location.hash||"#home").slice(1); if(h.startsWith("product-")){openProductPage(Number(h.replace("product-","")));}else{show(h||"home");}}
+addEventListener("hashchange",parseRoute);
+document.getElementById("langSel").addEventListener("change",(e)=>{ settings.lang=e.target.value; saveSettingsStore(); applyI18n(); });
+
+(function init(){
+  // Попробуем подтянуть товары из GitHub
+  loadFromGitHub().then(()=>{ renderProducts(); parseRoute(); });
+  applySettingsOnLoad();
+  renderProducts(); parseRoute();
+  document.getElementById('addBtn').addEventListener('click', (e)=>{e.preventDefault(); addProduct();});
+  document.getElementById("cartCount").textContent=cartCount();
+})();</script>
+</body>
+</html>
