@@ -1,0 +1,12 @@
+{
+  "routes": [
+    {
+      "src": "^/api/products/?$",
+      "dest": "/api/products.js"
+    },
+    {
+      "src": "^/api/products\\.js$",
+      "dest": "/api/products.js"
+    }
+  ]
+}
