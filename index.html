@@ -390,20 +390,32 @@ function checkout(){ if(cartTotal()<100){alert(tr("min_alert"));return;} alert("
 /* ===== GitHub sync ===== */
 async function saveToGitHub(){
   try{
-    const blob = new Blob([JSON.stringify(products, null, 2)], {type: 'application/json'});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'products.json';
-    document.body.appendChild(a);
-    a.click();
-    URL.revokeObjectURL(a.href);
-    a.remove();
-    alert('✅ products.json сохранён на ваш компьютер');
+    const res = await fetch('/api/products', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ products })
+    });
+    const j = await res.json();
+    if(j.ok){ alert('✅ products.json обновлён в GitHub'); }
+    else{ alert('Ошибка: ' + (j.error||'unknown')); }
   }catch(err){
-    alert('Не удалось создать экспорт: ' + (err && err.message ? err.message : err));
+    alert('Сеть недоступна или API не сконфигурировано');
   }
 }
-async function loadFromGitHub(){ return false; }
+async function loadFromGitHub(){
+  try{
+    const r = await fetch('/api/products');
+    if(!r.ok) return false;
+    const j = await r.json();
+    if(j && j.ok && Array.isArray(j.products) && j.products.length>0){
+      products = j.products;
+      saveData(); // синхронизируем локально для офлайн-режима
+      return true;
+    }
+  }catch(err){}
+  return false;
+}
+
 const formEl = document.getElementById("contactForm");
 const statusEl = document.getElementById("contactStatus");
 async function sendContact(fd){
