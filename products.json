@@ -42,7 +42,33 @@
     "desc": "",
     "photos": [
       "/img:/сет 4.png",
-      "/img:/Доверяй процессу.JPG"
+      "/img:/trusttheproces.JPG",
+      "/img:/ded.JPG",
+      "/img:/newDay.JPG"
+    ]
+  },
+  {
+    "id": 1763210017144,
+    "name": "set 5",
+    "price": 25,
+    "desc": "",
+    "photos": [
+      "/img:/сет 5.png",
+      "/img:/breath.JPG",
+      "/img:/beauty.JPG",
+      "/img:/minute.JPG"
+    ]
+  },
+  {
+    "id": 1763210125361,
+    "name": "set 6",
+    "price": 25,
+    "desc": "",
+    "photos": [
+      "/img:/сет 6.png",
+      "/img:/moment.JPG",
+      "/img:/light.JPG",
+      "/img:/feel.JPG"
     ]
   }
 ]
